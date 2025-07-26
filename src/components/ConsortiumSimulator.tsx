@@ -245,7 +245,7 @@ const ConsortiumSimulator = () => {
 
     try {
       const canvas = await html2canvas(pdfElement, {
-        scale: 2,
+        scale: 1.5,
         useCORS: true,
         backgroundColor: '#ffffff',
         width: 794,
@@ -262,17 +262,20 @@ const ConsortiumSimulator = () => {
       const imgWidth = 210;
       const pageHeight = 297;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+      
+      // Se a imagem for maior que a página, redimensiona para caber
+      if (imgHeight > pageHeight) {
+        const scaleFactor = pageHeight / imgHeight;
+        const scaledWidth = imgWidth * scaleFactor;
+        const scaledHeight = pageHeight;
+        
+        // Centraliza horizontalmente se necessário
+        const xOffset = (210 - scaledWidth) / 2;
+        pdf.addImage(imgData, 'PNG', xOffset, 0, scaledWidth, scaledHeight);
+      } else {
+        // Se cabe normalmente, adiciona centralizado verticalmente
+        const yOffset = (pageHeight - imgHeight) / 2;
+        pdf.addImage(imgData, 'PNG', 0, yOffset, imgWidth, imgHeight);
       }
 
       pdf.save(`simulacao-consorcio-${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`);
