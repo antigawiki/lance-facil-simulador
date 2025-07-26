@@ -106,10 +106,11 @@ const ConsortiumSimulator = () => {
     const remainingDebt = debtBalance - totalBidValue;
 
     // Opção 1: Reduzir valor da parcela (mesmo prazo)
-    const newInstallmentValue = remainingDebt / consortium.term;
+    const newInstallmentValue = (remainingDebt / consortium.term) + consortium.insuranceValue;
 
     // Opção 2: Reduzir prazo (mesma parcela)
-    const newTerm = Math.ceil(remainingDebt / consortium.installmentValue);
+    const installmentWithoutInsurance = consortium.installmentValue - consortium.insuranceValue;
+    const newTerm = Math.ceil(remainingDebt / installmentWithoutInsurance);
 
     setResult({
       totalBidValue,
