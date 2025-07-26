@@ -142,36 +142,136 @@ const ConsortiumSimulator = () => {
   };
 
   const generatePDF = async () => {
-    const element = document.getElementById('consortium-results');
-    if (!element || !result) return;
+    if (!result || !consortium.cardValue) return;
 
-    const canvas = await html2canvas(element, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: '#ffffff'
-    });
+    // Criar elemento temporário para o PDF com fundo branco
+    const pdfElement = document.createElement('div');
+    pdfElement.style.cssText = `
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+      width: 794px;
+      padding: 40px;
+      background: white;
+      color: #333;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    `;
 
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF();
+    const consortiumTypeName = consortiumTypes.find(t => t.value === consortium.type)?.label || consortium.type;
     
-    const imgWidth = 210;
-    const pageHeight = 295;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    let heightLeft = imgHeight;
+    pdfElement.innerHTML = `
+      <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #ff6600; padding-bottom: 20px;">
+        <h1 style="color: #ff6600; font-size: 28px; margin: 0; font-weight: bold;">Simulação de Lance - Consórcio</h1>
+        <p style="color: #666; font-size: 16px; margin: 10px 0 0 0;">Relatório detalhado da simulação</p>
+        <p style="color: #999; font-size: 14px; margin: 5px 0 0 0;">Data: ${new Date().toLocaleDateString('pt-BR')}</p>
+      </div>
 
-    let position = 0;
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+        <div>
+          <h2 style="color: #ff6600; font-size: 20px; margin: 0 0 15px 0; border-bottom: 2px solid #ff6600; padding-bottom: 5px;">Dados do Consórcio</h2>
+          <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+            <p style="margin: 8px 0; color: #333;"><strong>Tipo:</strong> ${consortiumTypeName}</p>
+            <p style="margin: 8px 0; color: #333;"><strong>Valor da Carta:</strong> ${formatCurrency(consortium.cardValue)}</p>
+            <p style="margin: 8px 0; color: #333;"><strong>Prazo:</strong> ${consortium.term} meses</p>
+            <p style="margin: 8px 0; color: #333;"><strong>Valor da Prestação:</strong> ${formatCurrency(consortium.installmentValue)}</p>
+            <p style="margin: 8px 0; color: #333;"><strong>Taxa de Administração:</strong> ${consortium.adminFee}%</p>
+            <p style="margin: 8px 0; color: #333;"><strong>Taxa do Fundo Reserva:</strong> ${consortium.reserveFundFee}%</p>
+            <p style="margin: 8px 0; color: #333;"><strong>Valor do Seguro:</strong> ${formatCurrency(consortium.insuranceValue)}</p>
+          </div>
+        </div>
 
-    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
+        <div>
+          <h2 style="color: #0066cc; font-size: 20px; margin: 0 0 15px 0; border-bottom: 2px solid #0066cc; padding-bottom: 5px;">Configuração do Lance</h2>
+          <div style="background: #f0f7ff; padding: 20px; border-radius: 8px;">
+            <p style="margin: 8px 0; color: #333;"><strong>Valor da Própria Carta:</strong> ${bid.ownCardType === 'percentage' ? `${bid.ownCardValue}%` : formatCurrency(bid.ownCardValue)}</p>
+            <p style="margin: 8px 0; color: #333;"><strong>Recursos Próprios:</strong> ${formatCurrency(bid.ownResourcesValue)}</p>
+          </div>
+        </div>
+      </div>
 
-    while (heightLeft >= 0) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
+      <div style="margin-bottom: 30px;">
+        <h2 style="color: #ff6600; font-size: 22px; margin: 0 0 20px 0; text-align: center; border-bottom: 3px solid #ff6600; padding-bottom: 10px;">Resultados da Simulação</h2>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+          <div style="text-align: center; background: #fff5f0; padding: 20px; border-radius: 8px; border: 2px solid #ff6600;">
+            <h3 style="color: #ff6600; font-size: 16px; margin: 0 0 10px 0;">Valor Total do Lance</h3>
+            <p style="color: #333; font-size: 24px; font-weight: bold; margin: 0;">${formatCurrency(result.totalBidValue)}</p>
+          </div>
+          <div style="text-align: center; background: #f0f7ff; padding: 20px; border-radius: 8px; border: 2px solid #0066cc;">
+            <h3 style="color: #0066cc; font-size: 16px; margin: 0 0 10px 0;">Percentual do Lance</h3>
+            <p style="color: #333; font-size: 24px; font-weight: bold; margin: 0;">${formatPercentage(result.bidPercentage)}</p>
+          </div>
+          <div style="text-align: center; background: #f0fff4; padding: 20px; border-radius: 8px; border: 2px solid #28a745;">
+            <h3 style="color: #28a745; font-size: 16px; margin: 0 0 10px 0;">Carta Restante</h3>
+            <p style="color: #333; font-size: 24px; font-weight: bold; margin: 0;">${formatCurrency(result.remainingCardValue)}</p>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <div style="background: #fff5f0; padding: 20px; border-radius: 8px; border: 2px solid #ff6600;">
+            <h3 style="color: #ff6600; font-size: 18px; margin: 0 0 15px 0;">🔻 Opção 1: Reduzir Parcela</h3>
+            <p style="margin: 8px 0; color: #333;"><strong>Nova parcela:</strong> ${formatCurrency(result.optionReduceInstallment.newInstallmentValue)}</p>
+            <p style="margin: 8px 0; color: #333;"><strong>Prazo:</strong> ${result.optionReduceInstallment.sameTerm} meses</p>
+            <p style="margin: 15px 0 0 0; padding: 10px; background: #ffebe6; border-radius: 4px; color: #666; font-size: 14px;">
+              <strong>Economia:</strong> ${formatCurrency(consortium.installmentValue - result.optionReduceInstallment.newInstallmentValue)} por mês
+            </p>
+          </div>
+
+          <div style="background: #f0f7ff; padding: 20px; border-radius: 8px; border: 2px solid #0066cc;">
+            <h3 style="color: #0066cc; font-size: 18px; margin: 0 0 15px 0;">⏰ Opção 2: Reduzir Prazo</h3>
+            <p style="margin: 8px 0; color: #333;"><strong>Novo prazo:</strong> ${result.optionReduceTerm.newTerm} meses</p>
+            <p style="margin: 8px 0; color: #333;"><strong>Parcela:</strong> ${formatCurrency(result.optionReduceTerm.sameInstallmentValue)}</p>
+            <p style="margin: 15px 0 0 0; padding: 10px; background: #e6f3ff; border-radius: 4px; color: #666; font-size: 14px;">
+              <strong>Redução:</strong> ${consortium.term - result.optionReduceTerm.newTerm} meses
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee; color: #666; font-size: 12px; text-align: center;">
+        <p style="margin: 0;">Este documento foi gerado pelo Simulador de Consórcio em ${new Date().toLocaleString('pt-BR')}</p>
+        <p style="margin: 5px 0 0 0;"><strong>Importante:</strong> Esta simulação é apenas orientativa. Consulte sempre as condições específicas do seu contrato.</p>
+      </div>
+    `;
+
+    document.body.appendChild(pdfElement);
+
+    try {
+      const canvas = await html2canvas(pdfElement, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        width: 794,
+        height: pdfElement.scrollHeight
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      const imgWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+
       pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
-    }
 
-    pdf.save(`simulacao-consorcio-${new Date().toLocaleDateString('pt-BR')}.pdf`);
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`simulacao-consorcio-${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`);
+    } finally {
+      document.body.removeChild(pdfElement);
+    }
   };
 
   return (
