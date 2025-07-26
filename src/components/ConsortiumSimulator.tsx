@@ -5,7 +5,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Calculator, TrendingUp, TrendingDown, DollarSign } from "lucide-react";
+import { Calculator, TrendingUp, TrendingDown, DollarSign, Download } from "lucide-react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 interface ConsortiumData {
   type: string;
@@ -139,6 +141,39 @@ const ConsortiumSimulator = () => {
     return ownCardPercentage <= 30 && ownResourcesPercentage <= 95;
   };
 
+  const generatePDF = async () => {
+    const element = document.getElementById('consortium-results');
+    if (!element || !result) return;
+
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff'
+    });
+
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF();
+    
+    const imgWidth = 210;
+    const pageHeight = 295;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    let heightLeft = imgHeight;
+
+    let position = 0;
+
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    while (heightLeft >= 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    pdf.save(`simulacao-consorcio-${new Date().toLocaleDateString('pt-BR')}.pdf`);
+  };
+
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -252,7 +287,7 @@ const ConsortiumSimulator = () => {
 
           {/* Configuração do Lance */}
           <Card className="shadow-md">
-            <CardHeader className="bg-gradient-to-r from-accent to-accent-light text-accent-foreground">
+            <CardHeader className="bg-gradient-to-r from-secondary to-accent-light text-secondary-foreground">
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5" />
                 Configuração do Lance
@@ -315,11 +350,22 @@ const ConsortiumSimulator = () => {
 
         {/* Resultados */}
         {result && consortium.cardValue > 0 && isValidBid() && (
-          <Card className="shadow-lg">
+          <Card className="shadow-lg" id="consortium-results">
             <CardHeader className="bg-gradient-to-r from-primary to-primary-light text-primary-foreground">
-              <CardTitle className="flex items-center gap-2">
-                <Calculator className="h-5 w-5" />
-                Resultados da Simulação
+              <CardTitle className="flex items-center gap-2 justify-between">
+                <div className="flex items-center gap-2">
+                  <Calculator className="h-5 w-5" />
+                  Resultados da Simulação
+                </div>
+                <Button 
+                  onClick={generatePDF}
+                  variant="secondary" 
+                  size="sm"
+                  className="bg-white/20 hover:bg-white/30 text-white border-white/20"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Baixar PDF
+                </Button>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
@@ -365,9 +411,9 @@ const ConsortiumSimulator = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="border-2 border-accent/20">
+                <Card className="border-2 border-secondary/20">
                   <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2 text-accent">
+                    <CardTitle className="flex items-center gap-2 text-secondary">
                       <TrendingDown className="h-5 w-5" />
                       Opção 2: Reduzir Prazo
                     </CardTitle>
@@ -375,13 +421,13 @@ const ConsortiumSimulator = () => {
                   <CardContent className="space-y-3">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Novo prazo:</span>
-                      <span className="font-semibold text-accent">{result.optionReduceTerm.newTerm} meses</span>
+                      <span className="font-semibold text-secondary">{result.optionReduceTerm.newTerm} meses</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Parcela:</span>
                       <span className="font-semibold">{formatCurrency(result.optionReduceTerm.sameInstallmentValue)}</span>
                     </div>
-                    <div className="p-3 bg-accent/5 rounded-md">
+                    <div className="p-3 bg-secondary/5 rounded-md">
                       <p className="text-sm text-muted-foreground">
                         Redução de {consortium.term - result.optionReduceTerm.newTerm} meses
                       </p>
