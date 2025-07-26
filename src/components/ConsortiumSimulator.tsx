@@ -98,8 +98,11 @@ const ConsortiumSimulator = () => {
     // Valor restante da carta
     const remainingCardValue = consortium.cardValue - ownCardBidValue;
 
+    // Calcular saldo devedor (carta + taxas)
+    const debtBalance = consortium.cardValue * (1 + consortium.adminFee/100 + consortium.reserveFundFee/100);
+    
     // Saldo devedor após o lance
-    const remainingDebt = consortium.cardValue - totalBidValue;
+    const remainingDebt = debtBalance - totalBidValue;
 
     // Opção 1: Reduzir valor da parcela (mesmo prazo)
     const newInstallmentValue = remainingDebt / consortium.term;
