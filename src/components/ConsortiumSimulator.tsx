@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Calculator, TrendingUp, TrendingDown, DollarSign, Download } from "lucide-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import itauLogo from "@/assets/itau-logo.png";
 
 interface ConsortiumData {
   type: string;
@@ -164,6 +165,9 @@ const ConsortiumSimulator = () => {
     
     pdfElement.innerHTML = `
       <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #ff6600; padding-bottom: 20px;">
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+          <img src="${itauLogo}" alt="Itaú" style="height: 60px;" />
+        </div>
         <h1 style="color: #ff6600; font-size: 28px; margin: 0; font-weight: bold;">Simulação de Lance - Consórcio</h1>
         <p style="color: #666; font-size: 16px; margin: 10px 0 0 0;">Relatório detalhado da simulação</p>
         <p style="color: #999; font-size: 14px; margin: 5px 0 0 0;">Data: ${new Date().toLocaleDateString('pt-BR')}</p>
@@ -281,6 +285,9 @@ const ConsortiumSimulator = () => {
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="text-center space-y-2">
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <img src={itauLogo} alt="Itaú" className="h-16 w-auto" />
+          </div>
           <h1 className="text-4xl font-bold text-foreground flex items-center justify-center gap-2">
             <Calculator className="h-8 w-8 text-primary" />
             Simulador de Lances de Consórcio
@@ -308,7 +315,7 @@ const ConsortiumSimulator = () => {
                   </SelectTrigger>
                   <SelectContent className="bg-card border">
                     {consortiumTypes.map((type) => (
-                      <SelectItem key={type.value} value={type.value}>
+                      <SelectItem key={type.value} value={type.value} className="text-foreground">
                         {type.label}
                       </SelectItem>
                     ))}
@@ -406,8 +413,8 @@ const ConsortiumSimulator = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-card border">
-                        <SelectItem value="percentage">%</SelectItem>
-                        <SelectItem value="amount">R$</SelectItem>
+                        <SelectItem value="percentage" className="text-foreground">%</SelectItem>
+                        <SelectItem value="amount" className="text-foreground">R$</SelectItem>
                       </SelectContent>
                     </Select>
                     <Input
