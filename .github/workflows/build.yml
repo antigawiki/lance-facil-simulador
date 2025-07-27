@@ -1,9 +1,7 @@
-name: Build and Deploy
+name: Build Project
 
 on:
   push:
-    branches: [ main, master ]
-  pull_request:
     branches: [ main, master ]
 
 jobs:
@@ -31,10 +29,3 @@ jobs:
         name: dist-files
         path: dist/
         retention-days: 30
-
-    - name: Deploy to GitHub Pages (optional)
-      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./dist
