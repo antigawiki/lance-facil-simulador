@@ -11,6 +11,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -23,10 +25,21 @@ jobs:
     - name: Build project
       run: npm run build
 
-    - name: Commit and push build files
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist-files
+        path: dist/
+        retention-days: 30
+
+    - name: Commit build files to repository
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add dist/
-        git diff --staged --quiet || git commit -m "Auto-build: Update dist folder"
-        git push
+        git add dist/ --force
+        if ! git diff --staged --quiet; then
+          git commit -m "Auto-build: Update dist folder [skip ci]"
+          git push
+        else
+          echo "No changes to commit"
+        fi
