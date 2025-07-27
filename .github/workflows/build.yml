@@ -23,9 +23,10 @@ jobs:
     - name: Build project
       run: npm run build
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: dist-files
-        path: dist/
-        retention-days: 30
+    - name: Commit and push build files
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add dist/
+        git diff --staged --quiet || git commit -m "Auto-build: Update dist folder"
+        git push
