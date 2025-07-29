@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Calculator, Handshake, Shield, TrendingUp } from "lucide-react";
+import { Calculator, Handshake, Shield, TrendingUp, BarChart3 } from "lucide-react";
 import itauLogo from "@/assets/itau-logo.png";
 
 const products = [
@@ -30,6 +30,13 @@ const products = [
     icon: TrendingUp,
     href: "/capitalizacao",
     color: "text-orange-600"
+  },
+  {
+    title: "Simulador de Investimentos",
+    description: "Compare rendimentos de diferentes investimentos",
+    icon: BarChart3,
+    href: "/simulador-investimentos",
+    color: "text-teal-600"
   }
 ];
 
@@ -53,7 +60,7 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 max-w-7xl mx-auto">
           {products.map((product) => (
             <Card 
               key={product.title}

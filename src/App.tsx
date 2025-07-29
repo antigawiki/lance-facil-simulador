@@ -9,6 +9,7 @@ import Combinaqui from "./pages/Combinaqui";
 import CombinaquiComparison from "./pages/CombinaquiComparison";
 import Seguros from "./pages/Seguros";
 import Capitalizacao from "./pages/Capitalizacao";
+import SimuladorInvestimentos from "./pages/SimuladorInvestimentos";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/combinaqui/:id" element={<CombinaquiComparison />} />
           <Route path="/seguros" element={<Seguros />} />
           <Route path="/capitalizacao" element={<Capitalizacao />} />
+          <Route path="/simulador-investimentos" element={<SimuladorInvestimentos />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
