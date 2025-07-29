@@ -16,9 +16,12 @@ interface Coverage {
   id: string;
   name: string;
   description: string;
-  basePrice: number;
+  basePrice: number; // Price per R$ 1,000 of coverage per month
   icon: any;
   required?: boolean;
+  defaultAmount: number; // Default coverage amount
+  minAmount: number;
+  maxAmount: number;
 }
 
 const coverages: Coverage[] = [
@@ -26,44 +29,62 @@ const coverages: Coverage[] = [
     id: "morte",
     name: "Morte Qualquer Causa",
     description: "Garante ao beneficiário o pagamento do valor contratado no caso de morte por doença, velhice ou acidente.",
-    basePrice: 3.50,
+    basePrice: 0.85, // R$ 0.85 per R$ 1,000
     icon: Shield,
-    required: true
+    required: true,
+    defaultAmount: 100000,
+    minAmount: 10000,
+    maxAmount: 1000000
   },
   {
     id: "invalidez",
     name: "Invalidez Permanente por Acidente", 
     description: "Garante pagamento no caso de invalidez funcional definitiva causada por acidente pessoal.",
-    basePrice: 1.80,
-    icon: AlertTriangle
+    basePrice: 0.45,
+    icon: AlertTriangle,
+    defaultAmount: 50000,
+    minAmount: 10000,
+    maxAmount: 500000
   },
   {
     id: "doencas",
     name: "Doenças Graves",
     description: "Indenização em caso de primeiro diagnóstico de câncer, infarto, AVC, insuficiência renal ou transplante de órgãos.",
-    basePrice: 2.90,
-    icon: Heart
+    basePrice: 1.20,
+    icon: Heart,
+    defaultAmount: 80000,
+    minAmount: 10000,
+    maxAmount: 300000
   },
   {
     id: "avaliacao",
     name: "Avaliação Clínica Preventiva",
     description: "Consulta médica com clínico geral e exames laboratoriais (2 acionamentos por vigência).",
-    basePrice: 4.50,
-    icon: Heart
+    basePrice: 18.50, // Valor fixo mensal
+    icon: Heart,
+    defaultAmount: 1,
+    minAmount: 1,
+    maxAmount: 1
   },
   {
     id: "funeral",
     name: "Assistência Funeral Familiar",
     description: "Conjunto de serviços para o segurado, cônjuge e filhos com até 21 anos em todo território nacional.",
-    basePrice: 6.80,
-    icon: Shield
+    basePrice: 24.90, // Valor fixo mensal
+    icon: Shield,
+    defaultAmount: 1,
+    minAmount: 1,
+    maxAmount: 1
   },
   {
     id: "assistencia24h",
     name: "Assistência 24h",
     description: "Serviço telefônico para orientações e auxílio no cancelamento de cartões, documentos, etc.",
-    basePrice: 3.20,
-    icon: Phone
+    basePrice: 12.50, // Valor fixo mensal
+    icon: Phone,
+    defaultAmount: 1,
+    minAmount: 1,
+    maxAmount: 1
   }
 ];
 
@@ -74,12 +95,24 @@ const Seguros = () => {
   
   const [age, setAge] = useState("");
   const [months, setMonths] = useState("");
-  const [coverageAmount, setCoverageAmount] = useState("50000");
   const [selectedCoverages, setSelectedCoverages] = useState<string[]>(["morte"]);
+  const [coverageAmounts, setCoverageAmounts] = useState<{[key: string]: number}>({
+    morte: 100000,
+    invalidez: 50000,
+    doencas: 80000,
+    avaliacao: 1,
+    funeral: 1,
+    assistencia24h: 1
+  });
   const [showSimulation, setShowSimulation] = useState(false);
 
-  const calculatePrice = (basePrice: number, ageValue: number, coverageAmount: number = 50000) => {
-    // Fator de idade baseado em faixas etárias reais de seguros Itaú
+  const calculatePrice = (coverage: Coverage, ageValue: number, coverageAmount: number) => {
+    // Para coberturas de valor fixo (avaliação, funeral, assistência)
+    if (coverage.id === "avaliacao" || coverage.id === "funeral" || coverage.id === "assistencia24h") {
+      return coverage.basePrice;
+    }
+
+    // Fator de idade baseado em faixas etárias reais de seguros
     let ageFactor = 1;
     if (ageValue >= 18 && ageValue <= 30) ageFactor = 0.8;
     else if (ageValue >= 31 && ageValue <= 40) ageFactor = 1.0;
@@ -89,8 +122,8 @@ const Seguros = () => {
     else if (ageValue > 70) ageFactor = 5.2;
 
     // Calcular preço por mil de cobertura
-    const pricePerThousand = (basePrice * ageFactor) / 1000;
-    return pricePerThousand * coverageAmount;
+    const pricePerThousand = coverage.basePrice * ageFactor;
+    return (pricePerThousand * coverageAmount) / 1000;
   };
 
   const handleCoverageToggle = (coverageId: string) => {
@@ -156,7 +189,6 @@ const Seguros = () => {
           <h2 style="color: #ff6600; font-size: 20px; margin: 0 0 15px 0; border-bottom: 2px solid #ff6600; padding-bottom: 5px;">Dados do Cliente</h2>
           <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
             <p style="margin: 8px 0; color: #333;"><strong>Idade:</strong> ${age} anos e ${months} meses</p>
-            <p style="margin: 8px 0; color: #333;"><strong>Valor da Cobertura:</strong> R$ ${parseInt(coverageAmount).toLocaleString('pt-BR')}</p>
             <p style="margin: 8px 0; color: #333;"><strong>Quantidade de Coberturas:</strong> ${selectedCoverages.length}</p>
           </div>
         </div>
@@ -178,7 +210,8 @@ const Seguros = () => {
             const coverage = coverages.find(c => c.id === coverageId);
             if (!coverage) return '';
             
-            const price = calculatePrice(coverage.basePrice, ageValue, parseInt(coverageAmount));
+            const amount = coverageAmounts[coverageId] || coverage.defaultAmount;
+            const price = calculatePrice(coverage, ageValue, amount);
             
             return `
               <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #ff6600;">
@@ -188,6 +221,7 @@ const Seguros = () => {
                     <p style="color: #666; font-size: 14px; margin: 0; line-height: 1.4;">${coverage.description}</p>
                   </div>
                   <div style="text-align: right; margin-left: 20px;">
+                    <p style="color: #666; font-size: 12px; margin: 0;">Valor: R$ ${amount.toLocaleString('pt-BR')}</p>
                     <p style="color: #ff6600; font-size: 18px; font-weight: bold; margin: 0;">R$ ${price.toFixed(2)}/mês</p>
                   </div>
                 </div>
@@ -268,10 +302,10 @@ const Seguros = () => {
   };
 
   const ageValue = parseInt(age) || 0;
-  const coverageAmountValue = parseInt(coverageAmount) || 50000;
   const totalMonthlyPrice = selectedCoverages.reduce((sum, coverageId) => {
     const coverage = coverages.find(c => c.id === coverageId);
-    return sum + (coverage ? calculatePrice(coverage.basePrice, ageValue, coverageAmountValue) : 0);
+    const amount = coverageAmounts[coverageId] || coverage?.defaultAmount || 0;
+    return sum + (coverage ? calculatePrice(coverage, ageValue, amount) : 0);
   }, 0);
 
   return (
@@ -338,57 +372,69 @@ const Seguros = () => {
                   </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="coverageAmount">Valor da Cobertura (R$)</Label>
-                  <Input
-                    id="coverageAmount"
-                    type="number"
-                    value={coverageAmount}
-                    onChange={(e) => setCoverageAmount(e.target.value)}
-                    placeholder="50000"
-                    min="10000"
-                    max="1000000"
-                    step="1000"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Valor mínimo: R$ 10.000 | Valor máximo: R$ 1.000.000
-                  </p>
-                </div>
+                 {/* Individual coverage amounts will be shown with each coverage */}
 
                 <div>
                   <Label className="text-base font-semibold mb-4 block">Coberturas Disponíveis</Label>
                   <div className="space-y-4">
-                    {coverages.map((coverage) => {
-                      const Icon = coverage.icon;
-                      const isSelected = selectedCoverages.includes(coverage.id);
-                      const price = calculatePrice(coverage.basePrice, ageValue, coverageAmountValue);
-                      
-                      return (
-                        <div key={coverage.id} className="flex items-start space-x-3 p-3 border rounded-lg">
-                          <Checkbox
-                            id={coverage.id}
-                            checked={isSelected}
-                            onCheckedChange={() => handleCoverageToggle(coverage.id)}
-                            disabled={coverage.required}
-                          />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Icon className="w-4 h-4 text-primary" />
-                              <Label htmlFor={coverage.id} className="font-medium cursor-pointer">
-                                {coverage.name}
-                              </Label>
-                              {coverage.required && (
-                                <Badge variant="secondary" className="text-xs">Obrigatória</Badge>
-                              )}
-                            </div>
-                            <p className="text-sm text-muted-foreground mb-2">{coverage.description}</p>
-                            <p className="text-sm font-semibold text-primary">
-                              R$ {price.toFixed(2)}/mês
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })}
+                     {coverages.map((coverage) => {
+                       const Icon = coverage.icon;
+                       const isSelected = selectedCoverages.includes(coverage.id);
+                       const currentAmount = coverageAmounts[coverage.id] || coverage.defaultAmount;
+                       const price = calculatePrice(coverage, ageValue, currentAmount);
+                       
+                       return (
+                         <div key={coverage.id} className="space-y-3 p-3 border rounded-lg">
+                           <div className="flex items-start space-x-3">
+                             <Checkbox
+                               id={coverage.id}
+                               checked={isSelected}
+                               onCheckedChange={() => handleCoverageToggle(coverage.id)}
+                               disabled={coverage.required}
+                             />
+                             <div className="flex-1 min-w-0">
+                               <div className="flex items-center gap-2 mb-1">
+                                 <Icon className="w-4 h-4 text-primary" />
+                                 <Label htmlFor={coverage.id} className="font-medium cursor-pointer">
+                                   {coverage.name}
+                                 </Label>
+                                 {coverage.required && (
+                                   <Badge variant="secondary" className="text-xs">Obrigatória</Badge>
+                                 )}
+                               </div>
+                               <p className="text-sm text-muted-foreground mb-2">{coverage.description}</p>
+                               <p className="text-sm font-semibold text-primary">
+                                 R$ {price.toFixed(2)}/mês
+                               </p>
+                             </div>
+                           </div>
+                           {coverage.id !== "avaliacao" && coverage.id !== "funeral" && coverage.id !== "assistencia24h" && (
+                             <div className="ml-7">
+                               <Label htmlFor={`amount-${coverage.id}`} className="text-xs">
+                                 Valor da Cobertura (R$)
+                               </Label>
+                               <Input
+                                 id={`amount-${coverage.id}`}
+                                 type="number"
+                                 value={currentAmount}
+                                 onChange={(e) => setCoverageAmounts(prev => ({
+                                   ...prev,
+                                   [coverage.id]: parseInt(e.target.value) || coverage.defaultAmount
+                                 }))}
+                                 min={coverage.minAmount}
+                                 max={coverage.maxAmount}
+                                 step="1000"
+                                 className="mt-1"
+                               />
+                               <p className="text-xs text-muted-foreground mt-1">
+                                 Min: R$ {coverage.minAmount.toLocaleString('pt-BR')} | 
+                                 Max: R$ {coverage.maxAmount.toLocaleString('pt-BR')}
+                               </p>
+                             </div>
+                           )}
+                         </div>
+                       );
+                     })}
                   </div>
                 </div>
 
@@ -424,7 +470,8 @@ const Seguros = () => {
                               if (!coverage) return null;
                               
                               const Icon = coverage.icon;
-                              const price = calculatePrice(coverage.basePrice, ageValue, coverageAmountValue);
+                               const amount = coverageAmounts[coverageId] || coverage.defaultAmount;
+                               const price = calculatePrice(coverage, ageValue, amount);
                               
                               return (
                                 <div key={coverageId} className="flex items-center justify-between p-3 bg-secondary/20 rounded-lg">

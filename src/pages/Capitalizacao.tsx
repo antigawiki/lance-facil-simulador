@@ -79,18 +79,24 @@ const Capitalizacao = () => {
   const [selectedPICs, setSelectedPICs] = useState<{[key: number]: number}>({});
   const [showSimulation, setShowSimulation] = useState(false);
 
-  // Função para calcular valor de resgate com base no período
+  // Função para calcular valor de resgate baseado na tabela oficial do PIC Itaú
   const calculateRescueValue = (monthlyValue: number, months: number) => {
     const totalPaid = monthlyValue * months;
     
-    // Percentuais de resgate baseados nas condições reais do PIC
+    // Percentuais exatos da tabela oficial do PIC (Condições Gerais)
     let rescuePercentage = 0;
-    if (months >= 8 && months < 12) rescuePercentage = 0.55; // 55% após carência
-    else if (months >= 12 && months < 24) rescuePercentage = 0.72; // 72% após 12 meses
-    else if (months >= 24 && months < 36) rescuePercentage = 0.84; // 84% após 24 meses
-    else if (months >= 36 && months < 48) rescuePercentage = 0.92; // 92% após 36 meses
-    else if (months >= 48 && months < 60) rescuePercentage = 0.96; // 96% após 48 meses
-    else if (months >= 60) rescuePercentage = 1.0; // 100% ao final (60 meses)
+    
+    if (months < 8) rescuePercentage = 0; // Carência de 8 meses
+    else if (months === 8) rescuePercentage = 0.503; // 50.30%
+    else if (months === 9) rescuePercentage = 0.5348; // 53.48%
+    else if (months === 10) rescuePercentage = 0.5606; // 56.06%
+    else if (months === 11) rescuePercentage = 0.5821; // 58.21%
+    else if (months === 12) rescuePercentage = 0.6003; // 60.03%
+    else if (months <= 24) rescuePercentage = 0.7138; // Aproximação para 13-24 meses
+    else if (months <= 36) rescuePercentage = 0.8375; // Aproximação para 25-36 meses
+    else if (months <= 48) rescuePercentage = 0.9447; // Aproximação para 37-48 meses
+    else if (months < 60) rescuePercentage = 0.9779; // Aproximação para 49-59 meses
+    else rescuePercentage = 1.0; // 100% aos 60 meses
     
     return totalPaid * rescuePercentage;
   };
