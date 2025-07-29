@@ -1,8 +1,9 @@
-name: Build Project
+name: Build and Package Project
 
 on:
   push:
     branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -16,6 +17,7 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
+        cache: 'npm'
 
     - name: Install dependencies
       run: npm install
@@ -26,5 +28,27 @@ jobs:
     - name: Upload build files
       uses: actions/upload-artifact@v4
       with:
-        name: dist-files
+        name: project-build
         path: dist/
+        retention-days: 30
+
+    - name: Upload source code
+      uses: actions/upload-artifact@v4
+      with:
+        name: project-source
+        path: |
+          src/
+          public/
+          index.html
+          package.json
+          package-lock.json
+          vite.config.ts
+          tailwind.config.ts
+          tsconfig.json
+          tsconfig.app.json
+          tsconfig.node.json
+          components.json
+          postcss.config.js
+          eslint.config.js
+          README.md
+        retention-days: 30
