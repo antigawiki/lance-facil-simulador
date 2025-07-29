@@ -25,58 +25,65 @@ interface InvestmentOption {
   description: string;
 }
 
-const investmentOptions: InvestmentOption[] = [
-  {
-    name: "Tesouro Selic",
-    type: "Renda Fixa",
-    annualRate: 15.0,
-    hasIOF: true,
-    hasIR: true,
-    riskLevel: "Conservador",
-    color: "#8884d8",
-    description: "Títulos do governo com rentabilidade atrelada à Selic"
-  },
-  {
-    name: "CDB",
-    type: "Renda Fixa",
-    annualRate: 15.0, // 100% CDI
-    hasIOF: true,
-    hasIR: true,
-    riskLevel: "Bom",
-    color: "#82ca9d",
-    description: "Certificado de Depósito Bancário - 100% CDI"
-  },
-  {
-    name: "LCI/LCA",
-    type: "Renda Fixa",
-    annualRate: 13.5, // 90% CDI
-    hasIOF: false,
-    hasIR: false,
-    riskLevel: "Moderado",
-    color: "#ffc658",
-    description: "Letras de Crédito com isenção de IR - 90% CDI"
-  },
-  {
-    name: "Poupança",
-    type: "Renda Fixa",
-    annualRate: 6.17,
-    hasIOF: false,
-    hasIR: false,
-    riskLevel: "Baixo",
-    color: "#ff7300",
-    description: "Tradicional caderneta de poupança"
-  },
-  {
-    name: "Fundos DI",
-    type: "Fundos",
-    annualRate: 12.75, // 85% CDI
-    hasIOF: true,
-    hasIR: true,
-    riskLevel: "Bom",
-    color: "#8dd1e1",
-    description: "Fundos de investimento DI - 85% CDI"
-  }
-];
+// Função para calcular CDI baseado na SELIC (sempre 0,10% abaixo)
+const getCDIRate = (selicRate: number) => selicRate - 0.10;
+
+const getInvestmentOptions = (selicRate: number): InvestmentOption[] => {
+  const cdiRate = getCDIRate(selicRate);
+  
+  return [
+    {
+      name: "Tesouro Selic",
+      type: "Renda Fixa",
+      annualRate: selicRate,
+      hasIOF: true,
+      hasIR: true,
+      riskLevel: "Conservador",
+      color: "#8884d8",
+      description: `Títulos do governo com rentabilidade atrelada à Selic (${selicRate.toFixed(2)}%)`
+    },
+    {
+      name: "CDB",
+      type: "Renda Fixa",
+      annualRate: cdiRate, // 100% CDI
+      hasIOF: true,
+      hasIR: true,
+      riskLevel: "Bom",
+      color: "#82ca9d",
+      description: `Certificado de Depósito Bancário - 100% CDI (${cdiRate.toFixed(2)}%)`
+    },
+    {
+      name: "LCI/LCA",
+      type: "Renda Fixa",
+      annualRate: cdiRate * 0.9, // 90% CDI
+      hasIOF: false,
+      hasIR: false,
+      riskLevel: "Moderado",
+      color: "#ffc658",
+      description: `Letras de Crédito com isenção de IR - 90% CDI (${(cdiRate * 0.9).toFixed(2)}%)`
+    },
+    {
+      name: "Poupança",
+      type: "Renda Fixa",
+      annualRate: selicRate > 8.5 ? selicRate * 0.7 + 1.5 : 6.17, // Regra da poupança
+      hasIOF: false,
+      hasIR: false,
+      riskLevel: "Baixo",
+      color: "#ff7300",
+      description: "Tradicional caderneta de poupança"
+    },
+    {
+      name: "Fundos DI",
+      type: "Fundos",
+      annualRate: cdiRate * 0.85, // 85% CDI
+      hasIOF: true,
+      hasIR: true,
+      riskLevel: "Bom",
+      color: "#8dd1e1",
+      description: `Fundos de investimento DI - 85% CDI (${(cdiRate * 0.85).toFixed(2)}%)`
+    }
+  ];
+};
 
 const SimuladorInvestimentos = () => {
   const navigate = useNavigate();
@@ -88,6 +95,9 @@ const SimuladorInvestimentos = () => {
   const [prazoMeses, setPrazoMeses] = useState<number>(60);
   const [selicRate, setSelicRate] = useState<number>(15.0);
   const [showResults, setShowResults] = useState(false);
+  
+  // Opções de investimento dinâmicas baseadas na SELIC
+  const investmentOptions = getInvestmentOptions(selicRate);
 
   // Função para calcular IR progressivo
   const calculateIR = (months: number, profit: number) => {
@@ -187,15 +197,9 @@ const SimuladorInvestimentos = () => {
     const newRate = rates[Math.floor(Math.random() * rates.length)];
     setSelicRate(newRate);
     
-    // Atualizar taxas baseadas na Selic
-    investmentOptions[0].annualRate = newRate; // Tesouro Selic
-    investmentOptions[1].annualRate = newRate; // CDB 100% CDI
-    investmentOptions[2].annualRate = newRate * 0.9; // LCI/LCA 90% CDI
-    investmentOptions[4].annualRate = newRate * 0.85; // Fundos DI 85% CDI
-    
     toast({
       title: "Taxa Selic atualizada",
-      description: `Nova taxa: ${newRate.toFixed(2)}% a.a.`,
+      description: `Nova taxa: ${newRate.toFixed(2)}% a.a. | CDI: ${getCDIRate(newRate).toFixed(2)}% a.a.`,
     });
     
     if (showResults) {
@@ -375,9 +379,15 @@ const SimuladorInvestimentos = () => {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Compare diferentes opções de investimento com rendimento líquido e impostos
           </p>
-          <div className="mt-4 flex items-center justify-center gap-2">
-            <TrendingUp className="w-5 h-5 text-green-600" />
-            <span className="text-green-600 font-semibold">Taxa Selic: {selicRate.toFixed(2)}% a.a.</span>
+          <div className="mt-4 flex items-center justify-center gap-4">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-green-600" />
+              <span className="text-green-600 font-semibold">Taxa Selic: {selicRate.toFixed(2)}% a.a.</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-blue-600" />
+              <span className="text-blue-600 font-semibold">CDI: {getCDIRate(selicRate).toFixed(2)}% a.a.</span>
+            </div>
           </div>
         </div>
 
