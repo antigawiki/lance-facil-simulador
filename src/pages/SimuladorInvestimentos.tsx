@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Download, RefreshCw, TrendingUp, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -494,18 +495,22 @@ const SimuladorInvestimentos = () => {
                             <div className="grid grid-cols-2 gap-4">
                               <div>
                                 <Label>Tipo de Taxa</Label>
-                                <select 
-                                  className="w-full p-2 border rounded mt-1"
+                                <Select 
                                   value={config.type}
-                                  onChange={(e) => {
+                                  onValueChange={(value: "cdi" | "fixed") => {
                                     const newConfigs = [...investmentConfigs];
-                                    newConfigs[index].type = e.target.value as "cdi" | "fixed";
+                                    newConfigs[index].type = value;
                                     setInvestmentConfigs(newConfigs);
                                   }}
                                 >
-                                  <option value="cdi">% do CDI</option>
-                                  <option value="fixed">Taxa Fixa</option>
-                                </select>
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="cdi">% do CDI</SelectItem>
+                                    <SelectItem value="fixed">Taxa Fixa</SelectItem>
+                                  </SelectContent>
+                                </Select>
                               </div>
                               <div>
                                 <Label>
