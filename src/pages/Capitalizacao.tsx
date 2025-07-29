@@ -329,22 +329,29 @@ const Capitalizacao = () => {
 
   const rescuePeriods = [12, 24, 36, 48, 60];
 
-  // Função para calcular faixa de prêmios personalizada
+  // Função para calcular faixa de prêmios personalizada baseada nos valores oficiais do Itaú
   const calculatePrizeRange = () => {
-    const selectedValues = Object.keys(selectedPICs).map(v => parseInt(v));
-    if (selectedValues.length === 0) return { min: 10000, max: 1000000 };
+    const selectedEntries = Object.entries(selectedPICs).filter(([_, quantity]) => quantity > 0);
+    if (selectedEntries.length === 0) return { min: 0, max: 0 };
     
-    const minPIC = Math.min(...selectedValues);
-    const maxPIC = Math.max(...selectedValues);
+    // Cálculo baseado nos múltiplos oficiais do Itaú:
+    // Quinzenal: 20x o valor da parcela
+    // Mensal: 2.223x o valor da parcela  
+    // Especial no último ano (5º ano): 50.000x o valor da parcela
     
-    // Base: R$ 10.000 a R$ 1.000.000
-    // Prêmios proporcionais ao valor do PIC
-    const minPrize = minPIC * 333; // PIC 30 = ~10.000
-    const maxPrize = maxPIC * 5263; // PIC 190 = ~1.000.000
+    const allValues = selectedEntries.map(([picValue, _]) => parseInt(picValue));
+    const minPIC = Math.min(...allValues);
+    const maxPIC = Math.max(...allValues);
+    
+    // Prêmio mínimo: sorteio quinzenal do menor PIC (20x)
+    const minPrize = minPIC * 20;
+    
+    // Prêmio máximo: sorteio especial do 5º ano do maior PIC (50.000x)
+    const maxPrize = maxPIC * 50000;
     
     return {
-      min: Math.max(10000, minPrize),
-      max: Math.min(1000000, maxPrize)
+      min: minPrize,
+      max: maxPrize
     };
   };
 
