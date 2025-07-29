@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Calculator, Handshake, Shield, TrendingUp } from "lucide-react";
+import itauLogo from "@/assets/itau-logo.png";
 
 const products = [
   {
@@ -37,6 +38,13 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
+          <div className="mb-6">
+            <img 
+              src={itauLogo} 
+              alt="Itaú Logo" 
+              className="h-20 mx-auto mb-4"
+            />
+          </div>
           <h1 className="text-4xl md:text-6xl font-bold text-primary mb-4">
             Bem Vindo Ituber
           </h1>
