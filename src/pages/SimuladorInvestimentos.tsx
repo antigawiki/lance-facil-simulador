@@ -65,12 +65,12 @@ const getInvestmentOptions = (selicRate: number): InvestmentOption[] => {
     {
       name: "Poupança",
       type: "Renda Fixa",
-      annualRate: selicRate > 8.5 ? selicRate * 0.7 + 1.5 : 6.17, // Regra da poupança
+      annualRate: 6.17, // Taxa fixa da poupança (70% da SELIC + TR quando SELIC > 8.5%)
       hasIOF: false,
       hasIR: false,
       riskLevel: "Baixo",
       color: "#ff7300",
-      description: "Tradicional caderneta de poupança"
+      description: "6.17% a.a."
     },
     {
       name: "Fundos DI",
@@ -95,30 +95,9 @@ const SimuladorInvestimentos = () => {
   const [prazoMeses, setPrazoMeses] = useState<number>(60);
   const [selicRate, setSelicRate] = useState<number>(15.0);
   const [showResults, setShowResults] = useState(false);
-  const [customRates, setCustomRates] = useState<Record<string, { type: 'cdi' | 'fixed', value: number }>>({});
   
-  // Opções de investimento dinâmicas baseadas na SELIC e configurações customizadas
-  const getAdjustedInvestmentOptions = () => {
-    const baseOptions = getInvestmentOptions(selicRate);
-    const cdiRate = getCDIRate(selicRate);
-    
-    return baseOptions.map(option => {
-      const customConfig = customRates[option.name];
-      if (customConfig) {
-        const adjustedRate = customConfig.type === 'cdi' 
-          ? cdiRate * (customConfig.value / 100)
-          : customConfig.value;
-        return {
-          ...option,
-          annualRate: adjustedRate,
-          description: `${option.description.split(' - ')[0]} - ${customConfig.type === 'cdi' ? `${customConfig.value}% CDI (${adjustedRate.toFixed(2)}%)` : `${customConfig.value}% a.a.`}`
-        };
-      }
-      return option;
-    });
-  };
-  
-  const investmentOptions = getAdjustedInvestmentOptions();
+  // Opções de investimento dinâmicas baseadas na SELIC
+  const investmentOptions = getInvestmentOptions(selicRate);
 
   // Função para calcular IR progressivo
   const calculateIR = (months: number, profit: number) => {
@@ -472,84 +451,54 @@ const SimuladorInvestimentos = () => {
                   Configurações dos Investimentos
                   <Badge variant="outline">Configurar</Badge>
                 </CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Personalize as taxas de rendimento
-                </p>
               </CardHeader>
               <CardContent className="space-y-4">
-                {getInvestmentOptions(selicRate).map((investment) => {
-                  const currentConfig = customRates[investment.name];
-                  const isCustomized = !!currentConfig;
+                {investmentOptions.map((investment) => {
+                  const result = showResults ? calculateInvestmentValue(investment, prazoMeses) : null;
                   
                   return (
-                    <div key={investment.name} className="p-3 border rounded-lg space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">{investment.name}</span>
-                        <Badge 
-                          variant={
+                    <Card key={investment.name} className="border-l-4" style={{ borderLeftColor: investment.color }}>
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg">{investment.name}</CardTitle>
+                          <Badge variant={
                             investment.riskLevel === "Baixo" ? "destructive" :
                             investment.riskLevel === "Moderado" ? "secondary" :
                             investment.riskLevel === "Bom" ? "default" : "outline"
-                          }
-                        >
-                          {investment.riskLevel}
-                        </Badge>
-                      </div>
+                          }>
+                            {investment.riskLevel}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{investment.description}</p>
+                      </CardHeader>
                       
-                      <div className="flex items-center gap-2">
-                        <select
-                          className="px-2 py-1 border rounded text-sm"
-                          value={currentConfig?.type || 'default'}
-                          onChange={(e) => {
-                            if (e.target.value === 'default') {
-                              const newRates = { ...customRates };
-                              delete newRates[investment.name];
-                              setCustomRates(newRates);
-                            } else {
-                              const type = e.target.value as 'cdi' | 'fixed';
-                              const defaultValue = type === 'cdi' ? 100 : investment.annualRate;
-                              setCustomRates({
-                                ...customRates,
-                                [investment.name]: { type, value: defaultValue }
-                              });
-                            }
-                          }}
-                        >
-                          <option value="default">Padrão</option>
-                          <option value="cdi">% do CDI</option>
-                          <option value="fixed">Taxa Fixa</option>
-                        </select>
-                        
-                        {isCustomized && (
-                          <>
-                            <Input
-                              type="number"
-                              value={currentConfig.value}
-                              onChange={(e) => setCustomRates({
-                                ...customRates,
-                                [investment.name]: {
-                                  ...currentConfig,
-                                  value: Number(e.target.value)
-                                }
-                              })}
-                              className="w-20 h-8 text-sm"
-                              step="0.1"
-                              min="0"
-                            />
-                            <span className="text-sm text-muted-foreground">
-                              {currentConfig.type === 'cdi' ? '% CDI' : '% a.a.'}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                      
-                      <p className="text-xs text-muted-foreground">
-                        Taxa atual: {investmentOptions.find(inv => inv.name === investment.name)?.annualRate.toFixed(2)}% a.a.
-                        {isCustomized && currentConfig.type === 'cdi' && (
-                          <span> ({currentConfig.value}% CDI = {(getCDIRate(selicRate) * currentConfig.value / 100).toFixed(2)}% a.a.)</span>
-                        )}
-                      </p>
-                    </div>
+                      {showResults && result && (
+                        <CardContent className="space-y-2">
+                          <div className="space-y-1">
+                            <p className="text-sm text-muted-foreground">Valor Bruto:</p>
+                            <p className="text-lg font-bold">R$ {result.grossValue.toLocaleString('pt-BR')}</p>
+                          </div>
+                          
+                          {result.taxes > 0 && (
+                            <div className="space-y-1">
+                              <p className="text-sm text-muted-foreground">Impostos:</p>
+                              <p className="text-sm font-semibold text-red-600">-R$ {result.taxes.toLocaleString('pt-BR')}</p>
+                            </div>
+                          )}
+                          
+                          <div className="space-y-1">
+                            <p className="text-sm text-muted-foreground">Valor Líquido:</p>
+                            <p className="text-xl font-bold text-green-600">R$ {result.netValue.toLocaleString('pt-BR')}</p>
+                          </div>
+                          
+                          <div className="pt-2 border-t space-y-1 text-sm">
+                            <p><span className="text-muted-foreground">Total Investido:</span> R$ {result.totalInvested.toLocaleString('pt-BR')}</p>
+                            <p><span className="text-muted-foreground">Rendimento Líquido:</span> R$ {result.netProfit.toLocaleString('pt-BR')}</p>
+                            <p><span className="text-muted-foreground">Rentabilidade Líquida:</span> <strong style={{ color: investment.color }}>{result.netProfitability.toFixed(1)}%</strong></p>
+                          </div>
+                        </CardContent>
+                      )}
+                    </Card>
                   );
                 })}
               </CardContent>
