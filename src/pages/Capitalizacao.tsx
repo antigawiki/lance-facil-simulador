@@ -54,19 +54,35 @@ const picPlans: PICPlan[] = [
     category: "varejo"
   },
   {
-    value: 150,
-    name: "PIC 150 Uniclass",
-    monthlyPayment: 150,
-    maxPrize: 7500000,
-    description: "Exclusivo Uniclass - Prêmios até R$ 7,5 milhões",
+    value: 40,
+    name: "PIC 40 Uniclass",
+    monthlyPayment: 40,
+    maxPrize: 2000000,
+    description: "Exclusivo Uniclass - Prêmios especiais quinzenais, mensais e anuais",
     category: "uniclass"
   },
   {
-    value: 200,
-    name: "PIC 200 Uniclass",
-    monthlyPayment: 200,
-    maxPrize: 10000000,
-    description: "Exclusivo Uniclass - Prêmios até R$ 10 milhões",
+    value: 90,
+    name: "PIC 90 Uniclass",
+    monthlyPayment: 90,
+    maxPrize: 4500000,
+    description: "Exclusivo Uniclass - Prêmios especiais quinzenais, mensais e anuais",
+    category: "uniclass"
+  },
+  {
+    value: 140,
+    name: "PIC 140 Uniclass",
+    monthlyPayment: 140,
+    maxPrize: 7000000,
+    description: "Exclusivo Uniclass - Prêmios especiais quinzenais, mensais e anuais",
+    category: "uniclass"
+  },
+  {
+    value: 190,
+    name: "PIC 190 Uniclass",
+    monthlyPayment: 190,
+    maxPrize: 9500000,
+    description: "Exclusivo Uniclass - Prêmios especiais quinzenais, mensais e anuais",
     category: "uniclass"
   }
 ];
@@ -478,23 +494,31 @@ const Capitalizacao = () => {
                         <Gift className="w-4 h-4" />
                         Participação em Sorteios
                       </h3>
-                      <div className="grid grid-cols-2 gap-3">
-                        {rescuePeriods.map((months) => {
-                          const draws = calculateDraws(months);
-                          
-                          return (
-                            <div key={months} className="p-3 bg-blue-50 rounded-lg text-center">
-                              <p className="text-sm font-medium text-blue-900">{months} meses</p>
-                              <p className="text-lg font-bold text-blue-700">{draws.total}</p>
-                              <p className="text-xs text-blue-600">sorteios totais</p>
-                              <div className="text-xs text-blue-600 mt-1">
-                                <p>{draws.biweekly} quinzenais</p>
-                                <p>{draws.monthly} mensais</p>
-                                <p>{draws.annual} anuais</p>
+                      <div className="space-y-4">
+                        <div className="p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200">
+                          <h4 className="font-semibold text-blue-900 mb-2">🎯 Sorteios Quinzenais</h4>
+                          <p className="text-sm text-blue-800 mb-1"><strong>360 títulos sorteados</strong> a cada quinzena</p>
+                          <p className="text-xs text-blue-600">Baseados na Loteria Federal - 1º e 3º sábados do mês</p>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3">
+                          {rescuePeriods.map((months) => {
+                            const draws = calculateDraws(months);
+                            
+                            return (
+                              <div key={months} className="p-3 bg-blue-50 rounded-lg text-center">
+                                <p className="text-sm font-medium text-blue-900">{months} meses</p>
+                                <p className="text-lg font-bold text-blue-700">{draws.total}</p>
+                                <p className="text-xs text-blue-600">sorteios totais</p>
+                                <div className="text-xs text-blue-600 mt-1">
+                                  <p>{draws.biweekly} quinzenais (360 títulos cada)</p>
+                                  <p>{draws.monthly} mensais (1 título cada)</p>
+                                  <p>{draws.annual} especiais (1 título cada)</p>
+                                </div>
                               </div>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
 
