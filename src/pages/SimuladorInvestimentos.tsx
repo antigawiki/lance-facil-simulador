@@ -4,20 +4,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Download, RefreshCw, TrendingUp } from "lucide-react";
+import { ArrowLeft, Download, RefreshCw, TrendingUp, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import itauLogo from "@/assets/itau-logo.png";
 
+interface InvestmentConfig {
+  name: string;
+  type: "cdi" | "fixed";
+  cdiPercentage?: number;
+  fixedRate?: number;
+  hasIOF: boolean;
+  hasIR: boolean;
+  riskLevel: "Baixo" | "Moderado" | "Bom" | "Conservador";
+  color: string;
+  description: string;
+}
+
 interface InvestmentOption {
   name: string;
   type: string;
   annualRate: number;
-  minRate?: number;
-  maxRate?: number;
   hasIOF: boolean;
   hasIR: boolean;
   riskLevel: "Baixo" | "Moderado" | "Bom" | "Conservador";
@@ -28,61 +39,76 @@ interface InvestmentOption {
 // Função para calcular CDI baseado na SELIC (sempre 0,10% abaixo)
 const getCDIRate = (selicRate: number) => selicRate - 0.10;
 
-const getInvestmentOptions = (selicRate: number): InvestmentOption[] => {
+const getDefaultInvestmentConfigs = (): InvestmentConfig[] => [
+  {
+    name: "Tesouro Selic",
+    type: "fixed",
+    fixedRate: 15.0,
+    hasIOF: true,
+    hasIR: true,
+    riskLevel: "Conservador",
+    color: "#8884d8",
+    description: "15.00% a.a."
+  },
+  {
+    name: "CDB",
+    type: "cdi",
+    cdiPercentage: 100,
+    hasIOF: true,
+    hasIR: true,
+    riskLevel: "Bom",
+    color: "#82ca9d",
+    description: "15.00% a.a. (100% CDI)"
+  },
+  {
+    name: "LCI/LCA",
+    type: "cdi",
+    cdiPercentage: 90,
+    hasIOF: false,
+    hasIR: false,
+    riskLevel: "Moderado",
+    color: "#ffc658",
+    description: "13.50% a.a. (90% CDI)"
+  },
+  {
+    name: "Poupança",
+    type: "fixed",
+    fixedRate: 6.17,
+    hasIOF: false,
+    hasIR: false,
+    riskLevel: "Baixo",
+    color: "#ff7300",
+    description: "6.17% a.a."
+  },
+  {
+    name: "Fundos DI",
+    type: "cdi",
+    cdiPercentage: 85,
+    hasIOF: true,
+    hasIR: true,
+    riskLevel: "Bom",
+    color: "#8dd1e1",
+    description: "12.75% a.a. (85% CDI)"
+  }
+];
+
+const getInvestmentOptions = (configs: InvestmentConfig[], selicRate: number): InvestmentOption[] => {
   const cdiRate = getCDIRate(selicRate);
   
-  return [
-    {
-      name: "Tesouro Selic",
-      type: "Renda Fixa",
-      annualRate: selicRate,
-      hasIOF: true,
-      hasIR: true,
-      riskLevel: "Conservador",
-      color: "#8884d8",
-      description: `Títulos do governo com rentabilidade atrelada à Selic (${selicRate.toFixed(2)}%)`
-    },
-    {
-      name: "CDB",
-      type: "Renda Fixa",
-      annualRate: cdiRate, // 100% CDI
-      hasIOF: true,
-      hasIR: true,
-      riskLevel: "Bom",
-      color: "#82ca9d",
-      description: `Certificado de Depósito Bancário - 100% CDI (${cdiRate.toFixed(2)}%)`
-    },
-    {
-      name: "LCI/LCA",
-      type: "Renda Fixa",
-      annualRate: cdiRate * 0.9, // 90% CDI
-      hasIOF: false,
-      hasIR: false,
-      riskLevel: "Moderado",
-      color: "#ffc658",
-      description: `Letras de Crédito com isenção de IR - 90% CDI (${(cdiRate * 0.9).toFixed(2)}%)`
-    },
-    {
-      name: "Poupança",
-      type: "Renda Fixa",
-      annualRate: 6.17, // Taxa fixa da poupança (70% da SELIC + TR quando SELIC > 8.5%)
-      hasIOF: false,
-      hasIR: false,
-      riskLevel: "Baixo",
-      color: "#ff7300",
-      description: "6.17% a.a."
-    },
-    {
-      name: "Fundos DI",
-      type: "Fundos",
-      annualRate: cdiRate * 0.85, // 85% CDI
-      hasIOF: true,
-      hasIR: true,
-      riskLevel: "Bom",
-      color: "#8dd1e1",
-      description: `Fundos de investimento DI - 85% CDI (${(cdiRate * 0.85).toFixed(2)}%)`
-    }
-  ];
+  return configs.map(config => ({
+    name: config.name,
+    type: "Renda Fixa",
+    annualRate: config.type === "cdi" 
+      ? cdiRate * (config.cdiPercentage! / 100)
+      : config.fixedRate!,
+    hasIOF: config.hasIOF,
+    hasIR: config.hasIR,
+    riskLevel: config.riskLevel,
+    color: config.color,
+    description: config.type === "cdi" 
+      ? `${(cdiRate * (config.cdiPercentage! / 100)).toFixed(2)}% a.a. (${config.cdiPercentage}% CDI)`
+      : `${config.fixedRate!.toFixed(2)}% a.a.`
+  }));
 };
 
 const SimuladorInvestimentos = () => {
@@ -95,9 +121,10 @@ const SimuladorInvestimentos = () => {
   const [prazoMeses, setPrazoMeses] = useState<number>(60);
   const [selicRate, setSelicRate] = useState<number>(15.0);
   const [showResults, setShowResults] = useState(false);
+  const [investmentConfigs, setInvestmentConfigs] = useState<InvestmentConfig[]>(getDefaultInvestmentConfigs());
   
   // Opções de investimento dinâmicas baseadas na SELIC
-  const investmentOptions = getInvestmentOptions(selicRate);
+  const investmentOptions = getInvestmentOptions(investmentConfigs, selicRate);
 
   // Função para calcular IR progressivo
   const calculateIR = (months: number, profit: number) => {
@@ -447,61 +474,68 @@ const SimuladorInvestimentos = () => {
             {/* Configurações dos Investimentos */}
             <Card className="mt-6">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center justify-between">
                   Configurações dos Investimentos
-                  <Badge variant="outline">Configurar</Badge>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="flex items-center gap-2">
+                        <Settings className="w-4 h-4" />
+                        Configurar
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle>Configurar Taxas dos Investimentos</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 max-h-96 overflow-y-auto">
+                        {investmentConfigs.map((config, index) => (
+                          <div key={config.name} className="p-4 border rounded-lg">
+                            <h4 className="font-semibold mb-3">{config.name}</h4>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label>Tipo de Taxa</Label>
+                                <select 
+                                  className="w-full p-2 border rounded mt-1"
+                                  value={config.type}
+                                  onChange={(e) => {
+                                    const newConfigs = [...investmentConfigs];
+                                    newConfigs[index].type = e.target.value as "cdi" | "fixed";
+                                    setInvestmentConfigs(newConfigs);
+                                  }}
+                                >
+                                  <option value="cdi">% do CDI</option>
+                                  <option value="fixed">Taxa Fixa</option>
+                                </select>
+                              </div>
+                              <div>
+                                <Label>
+                                  {config.type === "cdi" ? "% do CDI" : "Taxa Anual (%)"}
+                                </Label>
+                                <Input
+                                  type="number"
+                                  step="0.1"
+                                  min="0"
+                                  max={config.type === "cdi" ? "150" : "30"}
+                                  value={config.type === "cdi" ? config.cdiPercentage : config.fixedRate}
+                                  onChange={(e) => {
+                                    const newConfigs = [...investmentConfigs];
+                                    if (config.type === "cdi") {
+                                      newConfigs[index].cdiPercentage = Number(e.target.value);
+                                    } else {
+                                      newConfigs[index].fixedRate = Number(e.target.value);
+                                    }
+                                    setInvestmentConfigs(newConfigs);
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {investmentOptions.map((investment) => {
-                  const result = showResults ? calculateInvestmentValue(investment, prazoMeses) : null;
-                  
-                  return (
-                    <Card key={investment.name} className="border-l-4" style={{ borderLeftColor: investment.color }}>
-                      <CardHeader className="pb-2">
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg">{investment.name}</CardTitle>
-                          <Badge variant={
-                            investment.riskLevel === "Baixo" ? "destructive" :
-                            investment.riskLevel === "Moderado" ? "secondary" :
-                            investment.riskLevel === "Bom" ? "default" : "outline"
-                          }>
-                            {investment.riskLevel}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground">{investment.description}</p>
-                      </CardHeader>
-                      
-                      {showResults && result && (
-                        <CardContent className="space-y-2">
-                          <div className="space-y-1">
-                            <p className="text-sm text-muted-foreground">Valor Bruto:</p>
-                            <p className="text-lg font-bold">R$ {result.grossValue.toLocaleString('pt-BR')}</p>
-                          </div>
-                          
-                          {result.taxes > 0 && (
-                            <div className="space-y-1">
-                              <p className="text-sm text-muted-foreground">Impostos:</p>
-                              <p className="text-sm font-semibold text-red-600">-R$ {result.taxes.toLocaleString('pt-BR')}</p>
-                            </div>
-                          )}
-                          
-                          <div className="space-y-1">
-                            <p className="text-sm text-muted-foreground">Valor Líquido:</p>
-                            <p className="text-xl font-bold text-green-600">R$ {result.netValue.toLocaleString('pt-BR')}</p>
-                          </div>
-                          
-                          <div className="pt-2 border-t space-y-1 text-sm">
-                            <p><span className="text-muted-foreground">Total Investido:</span> R$ {result.totalInvested.toLocaleString('pt-BR')}</p>
-                            <p><span className="text-muted-foreground">Rendimento Líquido:</span> R$ {result.netProfit.toLocaleString('pt-BR')}</p>
-                            <p><span className="text-muted-foreground">Rentabilidade Líquida:</span> <strong style={{ color: investment.color }}>{result.netProfitability.toFixed(1)}%</strong></p>
-                          </div>
-                        </CardContent>
-                      )}
-                    </Card>
-                  );
-                })}
-              </CardContent>
             </Card>
           </div>
 
@@ -526,7 +560,7 @@ const SimuladorInvestimentos = () => {
                               {investment.riskLevel}
                             </Badge>
                           </div>
-                          <p className="text-sm text-muted-foreground">{investment.annualRate.toFixed(2)}% a.a.</p>
+                          <p className="text-sm text-muted-foreground">{investment.description}</p>
                         </CardHeader>
                         <CardContent className="space-y-2">
                           <div className="space-y-1">
