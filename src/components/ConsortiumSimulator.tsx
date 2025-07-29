@@ -5,7 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Calculator, TrendingUp, TrendingDown, DollarSign, Download } from "lucide-react";
+import { Calculator, TrendingUp, TrendingDown, DollarSign, Download, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import itauLogo from "@/assets/itau-logo.png";
@@ -52,6 +53,8 @@ const formatPercentage = (value: number) => {
 };
 
 const ConsortiumSimulator = () => {
+  const navigate = useNavigate();
+  
   const [consortium, setConsortium] = useState<ConsortiumData>({
     type: "",
     cardValue: 0,
@@ -288,6 +291,17 @@ const ConsortiumSimulator = () => {
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto space-y-6">
+        <div className="flex items-center justify-between mb-8">
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/")}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Voltar
+          </Button>
+        </div>
+
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-4 mb-4">
             <img src={itauLogo} alt="Itaú" className="h-16 w-auto" />

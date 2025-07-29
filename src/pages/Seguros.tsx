@@ -26,51 +26,44 @@ const coverages: Coverage[] = [
     id: "morte",
     name: "Morte Qualquer Causa",
     description: "Garante ao beneficiário o pagamento do valor contratado no caso de morte por doença, velhice ou acidente.",
-    basePrice: 45.00,
+    basePrice: 3.50,
     icon: Shield,
     required: true
   },
   {
     id: "invalidez",
-    name: "Invalidez Permanente por Acidente",
+    name: "Invalidez Permanente por Acidente", 
     description: "Garante pagamento no caso de invalidez funcional definitiva causada por acidente pessoal.",
-    basePrice: 25.00,
+    basePrice: 1.80,
     icon: AlertTriangle
   },
   {
     id: "doencas",
     name: "Doenças Graves",
     description: "Indenização em caso de primeiro diagnóstico de câncer, infarto, AVC, insuficiência renal ou transplante de órgãos.",
-    basePrice: 38.00,
+    basePrice: 2.90,
     icon: Heart
   },
   {
     id: "avaliacao",
     name: "Avaliação Clínica Preventiva",
     description: "Consulta médica com clínico geral e exames laboratoriais (2 acionamentos por vigência).",
-    basePrice: 15.00,
+    basePrice: 4.50,
     icon: Heart
   },
   {
     id: "funeral",
     name: "Assistência Funeral Familiar",
     description: "Conjunto de serviços para o segurado, cônjuge e filhos com até 21 anos em todo território nacional.",
-    basePrice: 18.00,
+    basePrice: 6.80,
     icon: Shield
   },
   {
     id: "assistencia24h",
     name: "Assistência 24h",
     description: "Serviço telefônico para orientações e auxílio no cancelamento de cartões, documentos, etc.",
-    basePrice: 12.00,
+    basePrice: 3.20,
     icon: Phone
-  },
-  {
-    id: "assistenciapet",
-    name: "Assistência PET",
-    description: "Serviço de cuidado e bem-estar para seu animal de estimação (cachorro ou gato).",
-    basePrice: 20.00,
-    icon: Heart
   }
 ];
 
@@ -81,20 +74,23 @@ const Seguros = () => {
   
   const [age, setAge] = useState("");
   const [months, setMonths] = useState("");
+  const [coverageAmount, setCoverageAmount] = useState("50000");
   const [selectedCoverages, setSelectedCoverages] = useState<string[]>(["morte"]);
   const [showSimulation, setShowSimulation] = useState(false);
 
-  const calculatePrice = (basePrice: number, ageValue: number) => {
-    // Fator de idade baseado em faixas etárias reais de seguros
+  const calculatePrice = (basePrice: number, ageValue: number, coverageAmount: number = 50000) => {
+    // Fator de idade baseado em faixas etárias reais de seguros Itaú
     let ageFactor = 1;
-    if (ageValue >= 18 && ageValue <= 25) ageFactor = 0.8;
-    else if (ageValue >= 26 && ageValue <= 35) ageFactor = 1.0;
-    else if (ageValue >= 36 && ageValue <= 45) ageFactor = 1.3;
-    else if (ageValue >= 46 && ageValue <= 55) ageFactor = 1.6;
-    else if (ageValue >= 56 && ageValue <= 65) ageFactor = 2.1;
-    else if (ageValue > 65) ageFactor = 2.8;
+    if (ageValue >= 18 && ageValue <= 30) ageFactor = 0.8;
+    else if (ageValue >= 31 && ageValue <= 40) ageFactor = 1.0;
+    else if (ageValue >= 41 && ageValue <= 50) ageFactor = 1.4;
+    else if (ageValue >= 51 && ageValue <= 60) ageFactor = 2.2;
+    else if (ageValue >= 61 && ageValue <= 70) ageFactor = 3.5;
+    else if (ageValue > 70) ageFactor = 5.2;
 
-    return basePrice * ageFactor;
+    // Calcular preço por mil de cobertura
+    const pricePerThousand = (basePrice * ageFactor) / 1000;
+    return pricePerThousand * coverageAmount;
   };
 
   const handleCoverageToggle = (coverageId: string) => {
@@ -130,28 +126,131 @@ const Seguros = () => {
   };
 
   const generatePDF = async () => {
-    if (!printRef.current) return;
+    if (!ageValue || !selectedCoverages.length) return;
+
+    // Criar elemento temporário para o PDF com fundo branco
+    const pdfElement = document.createElement('div');
+    pdfElement.style.cssText = `
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+      width: 794px;
+      padding: 40px;
+      background: white;
+      color: #333;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    `;
+    
+    pdfElement.innerHTML = `
+      <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #ff6600; padding-bottom: 20px;">
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+          <img src="${itauLogo}" alt="Itaú" style="height: 60px;" />
+        </div>
+        <h1 style="color: #ff6600; font-size: 28px; margin: 0; font-weight: bold;">Simulação Seguro Itaú Vida</h1>
+        <p style="color: #666; font-size: 16px; margin: 10px 0 0 0;">Relatório detalhado da simulação</p>
+        <p style="color: #999; font-size: 14px; margin: 5px 0 0 0;">Data: ${new Date().toLocaleDateString('pt-BR')}</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+        <div>
+          <h2 style="color: #ff6600; font-size: 20px; margin: 0 0 15px 0; border-bottom: 2px solid #ff6600; padding-bottom: 5px;">Dados do Cliente</h2>
+          <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+            <p style="margin: 8px 0; color: #333;"><strong>Idade:</strong> ${age} anos e ${months} meses</p>
+            <p style="margin: 8px 0; color: #333;"><strong>Valor da Cobertura:</strong> R$ ${parseInt(coverageAmount).toLocaleString('pt-BR')}</p>
+            <p style="margin: 8px 0; color: #333;"><strong>Quantidade de Coberturas:</strong> ${selectedCoverages.length}</p>
+          </div>
+        </div>
+
+        <div>
+          <h2 style="color: #0066cc; font-size: 20px; margin: 0 0 15px 0; border-bottom: 2px solid #0066cc; padding-bottom: 5px;">Resumo dos Valores</h2>
+          <div style="background: #f0f7ff; padding: 20px; border-radius: 8px;">
+            <p style="margin: 8px 0; color: #333;"><strong>Valor Total Mensal:</strong> R$ ${totalMonthlyPrice.toFixed(2)}</p>
+            <p style="margin: 8px 0; color: #333;"><strong>Valor Total Anual:</strong> R$ ${(totalMonthlyPrice * 12).toFixed(2)}</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 30px;">
+        <h2 style="color: #ff6600; font-size: 22px; margin: 0 0 20px 0; text-align: center; border-bottom: 3px solid #ff6600; padding-bottom: 10px;">Coberturas Contratadas</h2>
+        
+        <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
+          ${selectedCoverages.map((coverageId) => {
+            const coverage = coverages.find(c => c.id === coverageId);
+            if (!coverage) return '';
+            
+            const price = calculatePrice(coverage.basePrice, ageValue, parseInt(coverageAmount));
+            
+            return `
+              <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #ff6600;">
+                <div style="display: flex; justify-content: between; align-items: center;">
+                  <div style="flex: 1;">
+                    <h3 style="color: #ff6600; font-size: 16px; margin: 0 0 8px 0;">${coverage.name}</h3>
+                    <p style="color: #666; font-size: 14px; margin: 0; line-height: 1.4;">${coverage.description}</p>
+                  </div>
+                  <div style="text-align: right; margin-left: 20px;">
+                    <p style="color: #ff6600; font-size: 18px; font-weight: bold; margin: 0;">R$ ${price.toFixed(2)}/mês</p>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+
+      <div style="background: #f0f7ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <h3 style="color: #0066cc; font-size: 18px; margin: 0 0 15px 0;">💡 Informações Importantes</h3>
+        <ul style="color: #666; font-size: 14px; margin: 0; padding-left: 20px; line-height: 1.6;">
+          <li>Os valores podem variar de acordo com a análise de perfil de risco</li>
+          <li>Carência de acordo com cada cobertura contratada</li>
+          <li>Consulte as condições gerais do produto</li>
+          <li>Valores válidos para contratação até ${new Date().toLocaleDateString('pt-BR')}</li>
+        </ul>
+      </div>
+
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee; color: #666; font-size: 12px; text-align: center;">
+        <p style="margin: 0;">Este documento foi gerado pelo Simulador de Seguro de Vida em ${new Date().toLocaleString('pt-BR')}</p>
+        <p style="margin: 5px 0 0 0;"><strong>Importante:</strong> Esta simulação é apenas orientativa. Consulte sempre as condições específicas do produto.</p>
+      </div>
+    `;
+
+    document.body.appendChild(pdfElement);
 
     try {
-      const canvas = await html2canvas(printRef.current, {
-        scale: 2,
+      const canvas = await html2canvas(pdfElement, {
+        scale: 1.5,
         useCORS: true,
-        allowTaint: true
+        backgroundColor: '#ffffff',
+        width: 794,
+        height: pdfElement.scrollHeight
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
       });
       
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
       
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      const imgY = 30;
+      // Se a imagem for maior que a página, redimensiona para caber
+      if (imgHeight > pageHeight) {
+        const scaleFactor = pageHeight / imgHeight;
+        const scaledWidth = imgWidth * scaleFactor;
+        const scaledHeight = pageHeight;
+        
+        // Centraliza horizontalmente se necessário
+        const xOffset = (210 - scaledWidth) / 2;
+        pdf.addImage(imgData, 'PNG', xOffset, 0, scaledWidth, scaledHeight);
+      } else {
+        // Se cabe normalmente, adiciona centralizado verticalmente
+        const yOffset = (pageHeight - imgHeight) / 2;
+        pdf.addImage(imgData, 'PNG', 0, yOffset, imgWidth, imgHeight);
+      }
 
-      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
-      pdf.save(`simulacao-seguro-vida-itau.pdf`);
+      pdf.save(`simulacao-seguro-vida-${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`);
       
       toast({
         title: "PDF gerado com sucesso!",
@@ -163,13 +262,16 @@ const Seguros = () => {
         description: "Tente novamente em alguns instantes.",
         variant: "destructive",
       });
+    } finally {
+      document.body.removeChild(pdfElement);
     }
   };
 
   const ageValue = parseInt(age) || 0;
+  const coverageAmountValue = parseInt(coverageAmount) || 50000;
   const totalMonthlyPrice = selectedCoverages.reduce((sum, coverageId) => {
     const coverage = coverages.find(c => c.id === coverageId);
-    return sum + (coverage ? calculatePrice(coverage.basePrice, ageValue) : 0);
+    return sum + (coverage ? calculatePrice(coverage.basePrice, ageValue, coverageAmountValue) : 0);
   }, 0);
 
   return (
@@ -237,12 +339,29 @@ const Seguros = () => {
                 </div>
 
                 <div>
+                  <Label htmlFor="coverageAmount">Valor da Cobertura (R$)</Label>
+                  <Input
+                    id="coverageAmount"
+                    type="number"
+                    value={coverageAmount}
+                    onChange={(e) => setCoverageAmount(e.target.value)}
+                    placeholder="50000"
+                    min="10000"
+                    max="1000000"
+                    step="1000"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Valor mínimo: R$ 10.000 | Valor máximo: R$ 1.000.000
+                  </p>
+                </div>
+
+                <div>
                   <Label className="text-base font-semibold mb-4 block">Coberturas Disponíveis</Label>
                   <div className="space-y-4">
                     {coverages.map((coverage) => {
                       const Icon = coverage.icon;
                       const isSelected = selectedCoverages.includes(coverage.id);
-                      const price = calculatePrice(coverage.basePrice, ageValue);
+                      const price = calculatePrice(coverage.basePrice, ageValue, coverageAmountValue);
                       
                       return (
                         <div key={coverage.id} className="flex items-start space-x-3 p-3 border rounded-lg">
@@ -305,7 +424,7 @@ const Seguros = () => {
                               if (!coverage) return null;
                               
                               const Icon = coverage.icon;
-                              const price = calculatePrice(coverage.basePrice, ageValue);
+                              const price = calculatePrice(coverage.basePrice, ageValue, coverageAmountValue);
                               
                               return (
                                 <div key={coverageId} className="flex items-center justify-between p-3 bg-secondary/20 rounded-lg">

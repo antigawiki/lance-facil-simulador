@@ -137,28 +137,143 @@ const Capitalizacao = () => {
   };
 
   const generatePDF = async () => {
-    if (!printRef.current) return;
+    if (!showSimulation || Object.keys(selectedPICs).length === 0) return;
+
+    // Criar elemento temporário para o PDF com fundo branco
+    const pdfElement = document.createElement('div');
+    pdfElement.style.cssText = `
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+      width: 794px;
+      padding: 40px;
+      background: white;
+      color: #333;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    `;
+    
+    const picEntries = Object.entries(selectedPICs);
+    
+    pdfElement.innerHTML = `
+      <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #ff6600; padding-bottom: 20px;">
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+          <img src="${itauLogo}" alt="Itaú" style="height: 60px;" />
+        </div>
+        <h1 style="color: #ff6600; font-size: 28px; margin: 0; font-weight: bold;">Simulação PIC Itaú Capitalização</h1>
+        <p style="color: #666; font-size: 16px; margin: 10px 0 0 0;">Relatório detalhado da simulação</p>
+        <p style="color: #999; font-size: 14px; margin: 5px 0 0 0;">Data: ${new Date().toLocaleDateString('pt-BR')}</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+        <div>
+          <h2 style="color: #ff6600; font-size: 20px; margin: 0 0 15px 0; border-bottom: 2px solid #ff6600; padding-bottom: 5px;">PICs Selecionados</h2>
+          <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+            ${picEntries.map(([value, quantity]) => 
+              `<p style="margin: 8px 0; color: #333;"><strong>PIC R$ ${value}:</strong> ${quantity} unidade${quantity > 1 ? 's' : ''}</p>`
+            ).join('')}
+          </div>
+        </div>
+
+        <div>
+          <h2 style="color: #0066cc; font-size: 20px; margin: 0 0 15px 0; border-bottom: 2px solid #0066cc; padding-bottom: 5px;">Resumo dos Valores</h2>
+          <div style="background: #f0f7ff; padding: 20px; border-radius: 8px;">
+            <p style="margin: 8px 0; color: #333;"><strong>Valor Total Mensal:</strong> R$ ${totalMonthlyPayment.toFixed(2)}</p>
+            <p style="margin: 8px 0; color: #333;"><strong>Total Investido (60 meses):</strong> R$ ${(totalMonthlyPayment * 60).toFixed(2)}</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 30px;">
+        <h2 style="color: #ff6600; font-size: 22px; margin: 0 0 20px 0; text-align: center; border-bottom: 3px solid #ff6600; padding-bottom: 10px;">Valores de Resgate</h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
+          <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 2px solid #ff6600; text-align: center;">
+            <h3 style="color: #ff6600; font-size: 16px; margin: 0 0 10px 0;">12 meses</h3>
+            <p style="color: #333; font-size: 20px; font-weight: bold; margin: 0;">R$ ${calculateRescueValue(totalMonthlyPayment, 12).toFixed(2)}</p>
+          </div>
+          
+          <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 2px solid #0066cc; text-align: center;">
+            <h3 style="color: #0066cc; font-size: 16px; margin: 0 0 10px 0;">24 meses</h3>
+            <p style="color: #333; font-size: 20px; font-weight: bold; margin: 0;">R$ ${calculateRescueValue(totalMonthlyPayment, 24).toFixed(2)}</p>
+          </div>
+          
+          <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 2px solid #28a745; text-align: center;">
+            <h3 style="color: #28a745; font-size: 16px; margin: 0 0 10px 0;">36 meses</h3>
+            <p style="color: #333; font-size: 20px; font-weight: bold; margin: 0;">R$ ${calculateRescueValue(totalMonthlyPayment, 36).toFixed(2)}</p>
+          </div>
+          
+          <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 2px solid #6f42c1; text-align: center;">
+            <h3 style="color: #6f42c1; font-size: 16px; margin: 0 0 10px 0;">48 meses</h3>
+            <p style="color: #333; font-size: 20px; font-weight: bold; margin: 0;">R$ ${calculateRescueValue(totalMonthlyPayment, 48).toFixed(2)}</p>
+          </div>
+          
+          <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 2px solid #e83e8c; text-align: center;">
+            <h3 style="color: #e83e8c; font-size: 16px; margin: 0 0 10px 0;">60 meses</h3>
+            <p style="color: #333; font-size: 20px; font-weight: bold; margin: 0;">R$ ${calculateRescueValue(totalMonthlyPayment, 60).toFixed(2)}</p>
+          </div>
+          
+          <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 2px solid #ff6600; text-align: center;">
+            <h3 style="color: #ff6600; font-size: 16px; margin: 0 0 10px 0;">Total de Sorteios (60m)</h3>
+            <p style="color: #333; font-size: 20px; font-weight: bold; margin: 0;">${calculateDraws(60).total}</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="background: #f0f7ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <h3 style="color: #0066cc; font-size: 18px; margin: 0 0 15px 0;">🎯 Informações sobre Sorteios</h3>
+        <ul style="color: #666; font-size: 14px; margin: 0; padding-left: 20px; line-height: 1.6;">
+          <li>Sorteios quinzenais, mensais e anuais durante todo o período</li>
+          <li>Valores dos prêmios variam de R$ 10.000 a R$ 1.000.000</li>
+          <li>Seus números ficam válidos durante todo o período do plano</li>
+          <li>Valores de resgate garantidos independente dos sorteios</li>
+          <li>Rendimento competitivo com a poupança</li>
+        </ul>
+      </div>
+
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee; color: #666; font-size: 12px; text-align: center;">
+        <p style="margin: 0;">Este documento foi gerado pelo Simulador PIC Itaú em ${new Date().toLocaleString('pt-BR')}</p>
+        <p style="margin: 5px 0 0 0;"><strong>Importante:</strong> Esta simulação é apenas orientativa. Consulte sempre as condições específicas do produto.</p>
+      </div>
+    `;
+
+    document.body.appendChild(pdfElement);
 
     try {
-      const canvas = await html2canvas(printRef.current, {
-        scale: 2,
+      const canvas = await html2canvas(pdfElement, {
+        scale: 1.5,
         useCORS: true,
-        allowTaint: true
+        backgroundColor: '#ffffff',
+        width: 794,
+        height: pdfElement.scrollHeight
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
       });
       
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
       
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      const imgY = 30;
+      // Se a imagem for maior que a página, redimensiona para caber
+      if (imgHeight > pageHeight) {
+        const scaleFactor = pageHeight / imgHeight;
+        const scaledWidth = imgWidth * scaleFactor;
+        const scaledHeight = pageHeight;
+        
+        // Centraliza horizontalmente se necessário
+        const xOffset = (210 - scaledWidth) / 2;
+        pdf.addImage(imgData, 'PNG', xOffset, 0, scaledWidth, scaledHeight);
+      } else {
+        // Se cabe normalmente, adiciona centralizado verticalmente
+        const yOffset = (pageHeight - imgHeight) / 2;
+        pdf.addImage(imgData, 'PNG', 0, yOffset, imgWidth, imgHeight);
+      }
 
-      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
-      pdf.save(`simulacao-pic-capitalizacao-itau.pdf`);
+      pdf.save(`simulacao-pic-${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`);
       
       toast({
         title: "PDF gerado com sucesso!",
@@ -170,6 +285,8 @@ const Capitalizacao = () => {
         description: "Tente novamente em alguns instantes.",
         variant: "destructive",
       });
+    } finally {
+      document.body.removeChild(pdfElement);
     }
   };
 
