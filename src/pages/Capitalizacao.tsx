@@ -175,6 +175,7 @@ const Capitalizacao = () => {
     `;
     
     const picEntries = Object.entries(selectedPICs);
+    const prizeRange = calculatePrizeRange();
     
     pdfElement.innerHTML = `
       <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #ff6600; padding-bottom: 20px;">
@@ -241,11 +242,21 @@ const Capitalizacao = () => {
         </div>
       </div>
 
+      <div style="background: #f0f9f0; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <h3 style="color: #28a745; font-size: 18px; margin: 0 0 15px 0;">🏆 Faixa de Prêmios dos seus PICs</h3>
+        <div style="text-align: center; margin-bottom: 15px;">
+          <p style="color: #28a745; font-size: 24px; font-weight: bold; margin: 0;">
+            R$ ${prizeRange.min.toLocaleString('pt-BR')} - R$ ${prizeRange.max.toLocaleString('pt-BR')}
+          </p>
+          <p style="color: #666; font-size: 14px; margin: 5px 0 0 0;">Baseado nos PICs que você selecionou</p>
+        </div>
+      </div>
+
       <div style="background: #f0f7ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
         <h3 style="color: #0066cc; font-size: 18px; margin: 0 0 15px 0;">🎯 Informações sobre Sorteios</h3>
         <ul style="color: #666; font-size: 14px; margin: 0; padding-left: 20px; line-height: 1.6;">
           <li>Sorteios quinzenais, mensais e anuais durante todo o período</li>
-          <li>Valores dos prêmios variam de R$ 10.000 a R$ 1.000.000</li>
+          <li>Valores dos prêmios variam conforme o valor que você junta mensalmente</li>
           <li>Seus números ficam válidos durante todo o período do plano</li>
           <li>Valores de resgate garantidos independente dos sorteios</li>
           <li>Rendimento competitivo com a poupança</li>
@@ -317,6 +328,25 @@ const Capitalizacao = () => {
   }, 0);
 
   const rescuePeriods = [12, 24, 36, 48, 60];
+
+  // Função para calcular faixa de prêmios personalizada
+  const calculatePrizeRange = () => {
+    const selectedValues = Object.keys(selectedPICs).map(v => parseInt(v));
+    if (selectedValues.length === 0) return { min: 10000, max: 1000000 };
+    
+    const minPIC = Math.min(...selectedValues);
+    const maxPIC = Math.max(...selectedValues);
+    
+    // Base: R$ 10.000 a R$ 1.000.000
+    // Prêmios proporcionais ao valor do PIC
+    const minPrize = minPIC * 333; // PIC 30 = ~10.000
+    const maxPrize = maxPIC * 5263; // PIC 190 = ~1.000.000
+    
+    return {
+      min: Math.max(10000, minPrize),
+      max: Math.min(1000000, maxPrize)
+    };
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
@@ -519,6 +549,19 @@ const Capitalizacao = () => {
                             );
                           })}
                         </div>
+                      </div>
+                    </div>
+
+                    {/* Faixa de Prêmios Personalizada */}
+                    <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
+                      <h4 className="font-semibold text-green-900 mb-2">🏆 Faixa de Prêmios dos seus PICs</h4>
+                      <div className="text-center">
+                        <p className="text-2xl font-bold text-green-700">
+                          R$ {calculatePrizeRange().min.toLocaleString('pt-BR')} - R$ {calculatePrizeRange().max.toLocaleString('pt-BR')}
+                        </p>
+                        <p className="text-sm text-green-600 mt-1">
+                          Baseado nos PICs que você selecionou
+                        </p>
                       </div>
                     </div>
 
