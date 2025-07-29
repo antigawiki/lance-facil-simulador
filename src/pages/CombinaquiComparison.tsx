@@ -10,46 +10,122 @@ import { useRef } from "react";
 import itauLogo from "@/assets/itau-logo.png";
 
 const combinaquiData = {
-  essencial: {
-    name: "Combinaqui Essencial",
-    price: 49.90,
+  vida: {
+    name: "Combinaqui Vida",
+    price: 16.00,
+    category: "proteção",
+    economy: "81%",
     services: [
-      { name: "Conta Corrente", included: true, marketPrice: 25.00 },
-      { name: "Cartão de Crédito", included: true, marketPrice: 15.90 },
-      { name: "Pix Ilimitado", included: true, marketPrice: 0 },
-      { name: "TED/DOC (5 grátis)", included: true, marketPrice: 12.50 },
-      { name: "Cartão de Débito", included: true, marketPrice: 8.00 }
-    ]
+      { name: "Assistência Residencial Clássica", included: true, marketPrice: 45.00 },
+      { name: "Assistência de Saúde", included: true, marketPrice: 40.00 }
+    ],
+    availability: "Disponível para clientes Itaú",
+    description: "Assistência residencial clássica e assistência de saúde, com 81% de economia."
   },
-  completo: {
-    name: "Combinaqui Completo", 
-    price: 89.90,
+  tranquilidade: {
+    name: "Combinaqui Tranquilidade",
+    price: 26.00,
+    category: "proteção",
+    economy: "81%",
     services: [
-      { name: "Conta Corrente", included: true, marketPrice: 25.00 },
-      { name: "Cartão de Crédito Premium", included: true, marketPrice: 29.90 },
-      { name: "Pix Ilimitado", included: true, marketPrice: 0 },
-      { name: "TED/DOC Ilimitado", included: true, marketPrice: 25.00 },
-      { name: "Cartão de Débito", included: true, marketPrice: 8.00 },
-      { name: "Seguro Vida", included: true, marketPrice: 35.00 },
-      { name: "Capitalização", included: true, marketPrice: 20.00 },
-      { name: "Investimentos sem Taxa", included: true, marketPrice: 15.00 }
-    ]
+      { name: "Assistência de Saúde", included: true, marketPrice: 40.00 },
+      { name: "Assistência Residencial Clássica", included: true, marketPrice: 45.00 },
+      { name: "Assistência Auto", included: true, marketPrice: 52.00 }
+    ],
+    availability: "Disponível para clientes Itaú e Itaú Uniclass",
+    description: "Assistências de saúde, residencial clássica e auto, com 81% de economia."
   },
-  premium: {
-    name: "Combinaqui Premium",
-    price: 149.90,
+  protecao: {
+    name: "Combinaqui Proteção",
+    price: 37.00,
+    category: "proteção",
+    economy: "82%",
     services: [
-      { name: "Conta Corrente Premium", included: true, marketPrice: 45.00 },
-      { name: "Cartão de Crédito Black", included: true, marketPrice: 49.90 },
-      { name: "Pix Ilimitado", included: true, marketPrice: 0 },
-      { name: "TED/DOC Ilimitado", included: true, marketPrice: 25.00 },
-      { name: "Cartão de Débito Premium", included: true, marketPrice: 15.00 },
-      { name: "Seguro Vida Premium", included: true, marketPrice: 55.00 },
-      { name: "Capitalização Premium", included: true, marketPrice: 35.00 },
-      { name: "Investimentos Premium", included: true, marketPrice: 25.00 },
-      { name: "Assessoria Financeira", included: true, marketPrice: 80.00 },
-      { name: "Sala VIP Aeroporto", included: true, marketPrice: 30.00 }
-    ]
+      { name: "Assistência de Saúde", included: true, marketPrice: 40.00 },
+      { name: "Assistência Residencial Clássica", included: true, marketPrice: 45.00 },
+      { name: "Assistência Auto Premium", included: true, marketPrice: 65.00 },
+      { name: "10 dias sem juros no cheque especial", included: true, marketPrice: 15.00 }
+    ],
+    availability: "Disponível para clientes Itaú",
+    description: "Assistências de saúde, residencial clássica, auto premium e 10 dias sem juros no cheque especial."
+  },
+  protecao2: {
+    name: "Combinaqui Proteção II",
+    price: 37.00,
+    category: "proteção",
+    economy: "82%",
+    services: [
+      { name: "Assistência de Saúde", included: true, marketPrice: 40.00 },
+      { name: "Assistência Residencial Clássica", included: true, marketPrice: 45.00 },
+      { name: "Assistência Auto Premium", included: true, marketPrice: 65.00 },
+      { name: "Seguro Celular", included: true, marketPrice: 25.00 }
+    ],
+    availability: "Disponível para clientes Itaú e Itaú Uniclass",
+    description: "Assistências de saúde, residencial clássica, auto premium e seguro celular, com 82% de economia."
+  },
+  protecao3: {
+    name: "Combinaqui Proteção III",
+    price: 47.00,
+    category: "proteção",
+    economy: "75%",
+    services: [
+      { name: "Assistência de Saúde", included: true, marketPrice: 40.00 },
+      { name: "Assistência Residencial Clássica", included: true, marketPrice: 45.00 },
+      { name: "Assistência Auto Premium", included: true, marketPrice: 65.00 },
+      { name: "Seguro Celular", included: true, marketPrice: 25.00 },
+      { name: "10 dias sem juros no cheque especial", included: true, marketPrice: 15.00 }
+    ],
+    availability: "Disponível para clientes Itaú",
+    description: "Assistências de saúde, residencial clássica, auto premium, seguro celular e 10 dias sem juros no cheque especial."
+  },
+  conexao1: {
+    name: "Combinaqui Conexão I",
+    price: 16.00,
+    category: "conexão",
+    economy: "50%",
+    services: [
+      { name: "Deezer Premium", included: true, marketPrice: 20.90 },
+      { name: "500MB de Internet Extra", included: true, marketPrice: 12.00 }
+    ],
+    availability: "Disponível para clientes Itaú",
+    description: "Deezer Premium e 500MB de internet, com 50% de economia em relação ao valor original."
+  },
+  conexao2: {
+    name: "Combinaqui Conexão II",
+    price: 37.00,
+    category: "conexão",
+    economy: "22%",
+    services: [
+      { name: "Deezer Premium", included: true, marketPrice: 20.90 },
+      { name: "1GB de Internet Extra", included: true, marketPrice: 27.00 }
+    ],
+    availability: "Disponível para clientes Itaú",
+    description: "Deezer Premium e 1GB de internet, com 22% de economia."
+  },
+  conexao3: {
+    name: "Combinaqui Conexão III",
+    price: 47.00,
+    category: "conexão",
+    economy: "57%",
+    services: [
+      { name: "Deezer Premium", included: true, marketPrice: 20.90 },
+      { name: "1GB de Internet Extra", included: true, marketPrice: 27.00 },
+      { name: "Seguro Celular", included: true, marketPrice: 25.00 }
+    ],
+    availability: "Disponível para clientes Itaú e Itaú Uniclass",
+    description: "Deezer Premium, 1GB de internet e seguro celular, com 57% de economia."
+  },
+  recompensa1: {
+    name: "Combinaqui Recompensa I",
+    price: 37.00,
+    category: "recompensa",
+    economy: "43%",
+    services: [
+      { name: "Deezer Premium", included: true, marketPrice: 20.90 },
+      { name: "5% de Cashback nas contas de consumo", included: true, marketPrice: 45.00 }
+    ],
+    availability: "Disponível para clientes Itaú e Itaú Uniclass",
+    description: "Deezer Premium e 5% de cashback nas contas de consumo em débito automático."
   }
 };
 
@@ -78,7 +154,7 @@ const CombinaquiComparison = () => {
 
   const marketTotal = plan.services.reduce((sum, service) => sum + service.marketPrice, 0);
   const savings = marketTotal - plan.price;
-  const savingsPercentage = ((savings / marketTotal) * 100).toFixed(1);
+  const savingsPercentage = plan.economy;
 
   const generatePDF = async () => {
     if (!printRef.current) return;
@@ -141,7 +217,8 @@ const CombinaquiComparison = () => {
             <img src={itauLogo} alt="Itaú" className="h-12" />
             <div className="text-right">
               <h1 className="text-3xl font-bold text-primary mb-2">{plan.name}</h1>
-              <p className="text-muted-foreground">Comparativo de Serviços</p>
+              <p className="text-muted-foreground">{plan.description}</p>
+              <p className="text-sm text-muted-foreground mt-1">{plan.availability}</p>
             </div>
           </div>
 
@@ -189,9 +266,9 @@ const CombinaquiComparison = () => {
                   <div className="flex justify-between items-center p-4 bg-green-50 rounded-lg border-2 border-green-200">
                     <span className="font-medium text-green-700">Sua economia:</span>
                     <div className="text-right">
-                      <div className="text-xl font-bold text-green-600">R$ {savings.toFixed(2)}</div>
+                    <div className="text-2xl font-bold text-green-600">R$ {savings.toFixed(2)}</div>
                       <Badge variant="secondary" className="bg-green-100 text-green-700">
-                        {savingsPercentage}% de desconto
+                        {savingsPercentage} de desconto
                       </Badge>
                     </div>
                   </div>
@@ -217,6 +294,10 @@ const CombinaquiComparison = () => {
                 <span className="font-bold text-primary">R$ {plan.price.toFixed(2)}/mês</span>,
                 economizando <span className="font-bold text-green-600">R$ {savings.toFixed(2)} por mês</span> comparado 
                 aos preços individuais do mercado.
+              </p>
+              <p className="text-sm text-muted-foreground mt-3">
+                <strong>Categoria:</strong> {plan.category.charAt(0).toUpperCase() + plan.category.slice(1)} • 
+                <strong> Economia:</strong> {plan.economy}
               </p>
             </div>
           </div>
