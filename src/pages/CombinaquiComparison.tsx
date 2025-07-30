@@ -160,27 +160,170 @@ const CombinaquiComparison = () => {
   const savingsPercentage = plan.economy;
 
   const generatePDF = async () => {
-    if (!printRef.current) return;
+    const pdfElement = document.createElement('div');
+    pdfElement.style.cssText = `
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+      width: 794px;
+      padding: 40px;
+      background: white;
+      color: #333;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    `;
+    
+    // Buscar informações dos serviços
+    const servicesInfo: Record<string, any> = {
+      "Assistência de Saúde": {
+        description: "Serviços de saúde preventiva com possibilidade de incluir até 3 beneficiários.",
+        contact: "4000-1640 (capitais) ou 0800-836-8836"
+      },
+      "Assistência Residencial Clássica": {
+        description: "Serviços para reparos emergenciais elétricos, hidráulicos, desentupimento e chaveiro.",
+        contact: "0800 704 3837"
+      },
+      "Assistência Residencial Premium": {
+        description: "Serviços completos incluindo conserto de eletrodomésticos e assistência à informática.",
+        contact: "0800 704 3837"
+      },
+      "Assistência Auto": {
+        description: "Mecânico emergencial e guincho para situações de pane ou acidente.",
+        contact: "3003-3951 (capitais) ou 0800-703-3451"
+      },
+      "Assistência Auto Premium": {
+        description: "Serviços completos incluindo guincho, chaveiro, leva e traz e translado.",
+        contact: "3003-3951 (capitais) ou 0800-703-3451"
+      },
+      "Seguro Celular": {
+        description: "Proteção contra roubo ou furto qualificado oferecido pela Chubb Seguros.",
+        contact: "0800 000 0671"
+      },
+      "10 dias sem juros no cheque especial": {
+        description: "Benefício que permite usar o limite da conta sem juros por 10 dias corridos.",
+        contact: "4004-4828 (capitais) ou 0800-970-4828"
+      },
+      "Deezer Premium": {
+        description: "Mais de 56 milhões de músicas, playlists, podcasts e download offline sem anúncios.",
+        contact: "Acesso via app Deezer"
+      },
+      "500MB de Internet Extra": {
+        description: "500MB de dados móveis para operadoras Vivo, Claro e Tim com validade de 30 dias.",
+        contact: "Sua operadora"
+      },
+      "1GB de Internet Extra": {
+        description: "1GB de dados móveis para operadoras Vivo, Claro e Tim com validade de 30 dias.",
+        contact: "Sua operadora"
+      },
+      "5% de Cashback nas contas de consumo": {
+        description: "5% de retorno em contas de luz, água, gás, internet e TV a cabo em débito automático.",
+        contact: "Crédito automático na conta"
+      }
+    };
+    
+    pdfElement.innerHTML = `
+      <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #ff6600; padding-bottom: 20px;">
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+          <img src="${itauLogo}" alt="Itaú" style="height: 60px;" />
+        </div>
+        <h1 style="color: #ff6600; font-size: 28px; margin: 0; font-weight: bold;">${plan.name}</h1>
+        <p style="color: #666; font-size: 16px; margin: 10px 0 0 0;">Comparativo Detalhado</p>
+        <p style="color: #999; font-size: 14px; margin: 5px 0 0 0;">Data: ${new Date().toLocaleDateString('pt-BR')}</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+        <div>
+          <h2 style="color: #ff6600; font-size: 20px; margin: 0 0 15px 0;">Informações do Combo</h2>
+          <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+            <p style="margin: 8px 0;"><strong>Nome:</strong> ${plan.name}</p>
+            <p style="margin: 8px 0;"><strong>Categoria:</strong> ${plan.category.charAt(0).toUpperCase() + plan.category.slice(1)}</p>
+            <p style="margin: 8px 0;"><strong>Preço Mensal:</strong> R$ ${plan.price.toFixed(2)}</p>
+            <p style="margin: 8px 0;"><strong>Disponibilidade:</strong> ${plan.availability}</p>
+            <p style="margin: 8px 0;"><strong>Economia:</strong> ${plan.economy}</p>
+          </div>
+        </div>
+
+        <div>
+          <h2 style="color: #0066cc; font-size: 20px; margin: 0 0 15px 0;">Resumo Financeiro</h2>
+          <div style="background: #f0f7ff; padding: 20px; border-radius: 8px;">
+            <p style="margin: 8px 0;"><strong>Total avulso:</strong> R$ ${marketTotal.toFixed(2)}</p>
+            <p style="margin: 8px 0;"><strong>Preço Combinaqui:</strong> R$ ${plan.price.toFixed(2)}</p>
+            <p style="margin: 8px 0; color: #22c55e;"><strong>Economia mensal:</strong> R$ ${savings.toFixed(2)}</p>
+            <p style="margin: 8px 0; color: #22c55e;"><strong>Economia anual:</strong> R$ ${(savings * 12).toFixed(2)}</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 30px;">
+        <h2 style="color: #ff6600; font-size: 22px; margin: 0 0 20px 0;">Serviços Inclusos</h2>
+        ${plan.services.map((service, index) => `
+          <div style="background: #f8f9fa; margin-bottom: 15px; padding: 20px; border-radius: 8px; border-left: 5px solid #22c55e;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <h3 style="color: #22c55e; margin: 0; font-size: 18px;">${service.name}</h3>
+              <div style="text-align: right;">
+                <p style="margin: 0; font-size: 14px; color: #666;">Preço avulso</p>
+                <p style="margin: 0; font-size: 16px; font-weight: bold;">R$ ${service.marketPrice.toFixed(2)}</p>
+              </div>
+            </div>
+            <p style="margin: 10px 0 0 0; color: #666; font-size: 14px; line-height: 1.4;">
+              ${servicesInfo[service.name]?.description || 'Serviço premium com benefícios exclusivos.'}
+            </p>
+            ${servicesInfo[service.name]?.contact ? `
+              <p style="margin: 10px 0 0 0; color: #999; font-size: 12px;">
+                <strong>Contato:</strong> ${servicesInfo[service.name].contact}
+              </p>
+            ` : ''}
+          </div>
+        `).join('')}
+      </div>
+
+      <div style="background: #fff5f0; padding: 20px; border-radius: 8px; border: 2px solid #ff6600; margin-bottom: 20px;">
+        <h3 style="color: #ff6600; font-size: 18px; margin: 0 0 10px 0;">💡 Vantagem do Combinaqui</h3>
+        <p style="margin: 0; color: #666; line-height: 1.4;">
+          ${plan.description} Com economia de <strong style="color: #22c55e;">R$ ${savings.toFixed(2)} por mês</strong> 
+          comparado aos preços individuais do mercado. Isso representa uma economia anual de 
+          <strong style="color: #22c55e;">R$ ${(savings * 12).toFixed(2)}</strong>.
+        </p>
+      </div>
+
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee; color: #666; font-size: 12px; text-align: center;">
+        <p style="margin: 0;">Comparativo gerado pelo Combinaqui Itaú em ${new Date().toLocaleString('pt-BR')}</p>
+        <p style="margin: 5px 0 0 0;"><strong>Importante:</strong> Este comparativo é apenas orientativo. Consulte as condições específicas de cada serviço.</p>
+      </div>
+    `;
+
+    document.body.appendChild(pdfElement);
 
     try {
-      const canvas = await html2canvas(printRef.current, {
-        scale: 2,
+      const canvas = await html2canvas(pdfElement, {
+        scale: 1.5,
         useCORS: true,
-        allowTaint: true
+        backgroundColor: '#ffffff',
+        width: 794,
+        height: pdfElement.scrollHeight
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
       });
       
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('l', 'mm', 'a4');
+      const imgWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
       
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      const imgY = 30;
+      if (imgHeight > pageHeight) {
+        const scaleFactor = pageHeight / imgHeight;
+        const scaledWidth = imgWidth * scaleFactor;
+        const scaledHeight = pageHeight;
+        const xOffset = (210 - scaledWidth) / 2;
+        pdf.addImage(imgData, 'PNG', xOffset, 0, scaledWidth, scaledHeight);
+      } else {
+        const yOffset = (pageHeight - imgHeight) / 2;
+        pdf.addImage(imgData, 'PNG', 0, yOffset, imgWidth, imgHeight);
+      }
 
-      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
       pdf.save(`comparativo-${plan.name.toLowerCase().replace(/\s+/g, '-')}.pdf`);
       
       toast({
@@ -193,6 +336,8 @@ const CombinaquiComparison = () => {
         description: "Tente novamente em alguns instantes.",
         variant: "destructive",
       });
+    } finally {
+      document.body.removeChild(pdfElement);
     }
   };
 
