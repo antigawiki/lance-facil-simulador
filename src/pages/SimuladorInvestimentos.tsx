@@ -588,13 +588,30 @@ const SimuladorInvestimentos = () => {
                         <CardHeader className="pb-2">
                           <div className="flex items-center justify-between">
                             <CardTitle className="text-lg">{investment.name}</CardTitle>
-                            <Badge variant={
-                              investment.riskLevel === "Baixo" ? "destructive" :
-                              investment.riskLevel === "Moderado" ? "secondary" :
-                              investment.riskLevel === "Bom" ? "default" : "outline"
-                            }>
-                              {investment.riskLevel}
-                            </Badge>
+                            <div className="flex gap-2">
+                              <Badge variant={
+                                investment.riskLevel === "Baixo" ? "secondary" :
+                                investment.riskLevel === "Moderado" ? "outline" :
+                                investment.riskLevel === "Bom" ? "default" : "secondary"
+                              }>
+                                {investment.riskLevel} Risco
+                              </Badge>
+                              {showResults && (() => {
+                                const allResults = investmentOptions.map(inv => calculateInvestmentValue(inv, prazoMeses));
+                                const sortedResults = allResults.sort((a, b) => b.netProfitability - a.netProfitability);
+                                const currentIndex = sortedResults.findIndex(r => r.netProfitability === result.netProfitability);
+                                
+                                const performanceLabel = currentIndex === 0 ? "🏆 Melhor" :
+                                                       currentIndex <= 1 ? "⭐ Ótimo" :
+                                                       currentIndex <= 2 ? "👍 Bom" : "📊 Regular";
+                                
+                                return (
+                                  <Badge variant="default" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                    {performanceLabel}
+                                  </Badge>
+                                );
+                              })()}
+                            </div>
                           </div>
                           <p className="text-sm text-muted-foreground">{investment.description}</p>
                         </CardHeader>
