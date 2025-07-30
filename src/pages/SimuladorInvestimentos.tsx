@@ -588,30 +588,36 @@ const SimuladorInvestimentos = () => {
                         <CardHeader className="pb-2">
                           <div className="flex items-center justify-between">
                             <CardTitle className="text-lg">{investment.name}</CardTitle>
-                            <div className="flex gap-2">
-                              <Badge variant={
-                                investment.riskLevel === "Baixo" ? "secondary" :
-                                investment.riskLevel === "Moderado" ? "outline" :
-                                investment.riskLevel === "Bom" ? "default" : "secondary"
-                              }>
-                                {investment.riskLevel} Risco
-                              </Badge>
-                              {showResults && (() => {
-                                const allResults = investmentOptions.map(inv => calculateInvestmentValue(inv, prazoMeses));
-                                const sortedResults = allResults.sort((a, b) => b.netProfitability - a.netProfitability);
-                                const currentIndex = sortedResults.findIndex(r => r.netProfitability === result.netProfitability);
-                                
-                                const performanceLabel = currentIndex === 0 ? "🏆 Melhor" :
-                                                       currentIndex <= 1 ? "⭐ Ótimo" :
-                                                       currentIndex <= 2 ? "👍 Bom" : "📊 Regular";
-                                
-                                return (
-                                  <Badge variant="default" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                    {performanceLabel}
-                                  </Badge>
-                                );
-                              })()}
-                            </div>
+                            {showResults && (() => {
+                              const allResults = investmentOptions.map(inv => calculateInvestmentValue(inv, prazoMeses));
+                              const sortedResults = allResults.sort((a, b) => b.netProfitability - a.netProfitability);
+                              const bestResult = sortedResults[0].netProfitability;
+                              
+                              const currentResult = result.netProfitability;
+                              
+                              let performanceLabel = "";
+                              let badgeClass = "";
+                              
+                              if (currentResult === bestResult) {
+                                performanceLabel = "Melhor";
+                                badgeClass = "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
+                              } else if (currentResult >= bestResult * 0.9) {
+                                performanceLabel = "Ótimo";
+                                badgeClass = "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+                              } else if (currentResult >= bestResult * 0.81) { // 0.9 * 0.9 = 0.81
+                                performanceLabel = "Bom";
+                                badgeClass = "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
+                              } else {
+                                performanceLabel = "Ruim";
+                                badgeClass = "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+                              }
+                              
+                              return (
+                                <Badge variant="outline" className={badgeClass}>
+                                  {performanceLabel}
+                                </Badge>
+                              );
+                            })()}
                           </div>
                           <p className="text-sm text-muted-foreground">{investment.description}</p>
                         </CardHeader>
