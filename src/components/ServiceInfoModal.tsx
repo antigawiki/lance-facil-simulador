@@ -14,201 +14,202 @@ interface ServiceInfo {
 
 const servicesInfo: Record<string, ServiceInfo> = {
   "Assistência de Saúde": {
-    name: "Assistência de Saúde",
-    description: "Serviço de assistência médica e orientação de saúde 24 horas por dia, 7 dias por semana.",
+    name: "Assistência de Saúde (Programa TEM Saúde)",
+    description: "Serviços de saúde preventiva com possibilidade de incluir até 3 beneficiários.",
     coverage: [
-      "Orientação médica por telefone 24h",
-      "Indicação de médicos e hospitais",
-      "Agendamento de consultas",
-      "Segunda opinião médica",
-      "Orientação sobre medicamentos",
-      "Primeiros socorros por telefone",
-      "Informações sobre exames médicos",
-      "Orientação nutricional básica"
+      "Check-up médico com clínico geral ou ginecologista",
+      "Exames conforme plano contratado",
+      "Consulta de retorno em até 30 dias",
+      "Até 30% de desconto em medicamentos nas farmácias credenciadas",
+      "Plataforma de bem-estar com + de 5.000 conteúdos em vídeo",
+      "Rede de academias modelo pay-per-use",
+      "Assistente digital",
+      "Cobertura em território nacional"
     ],
     limitations: [
-      "Não substitui consulta médica presencial",
-      "Não inclui custos de consultas ou exames",
-      "Limitado a orientações e informações"
+      "Agendamento em até 48h úteis",
+      "Até 3 reagendamentos por período",
+      "Não inclui exames adicionais para diagnóstico complementar",
+      "Não inclui continuidade de tratamento médico",
+      "Retorno limitado a 30 dias da primeira consulta"
     ],
-    availability: "24 horas por dia, 7 dias por semana",
-    contact: "0800 722 4444",
+    availability: "Segunda à sexta das 7h às 19h, exceto feriados",
+    contact: "4000-1640 (capitais) ou 0800-836-8836 (demais localidades)",
     icon: <Shield className="w-6 h-6" />
   },
   "Assistência Residencial Clássica": {
     name: "Assistência Residencial Clássica",
-    description: "Serviços de assistência residencial para emergências domésticas.",
+    description: "Serviços para reparos emergenciais residenciais oferecidos pela Tempo Assistência.",
     coverage: [
-      "Chaveiro 24h (perda ou quebra de chaves)",
-      "Eletricista para emergências",
-      "Guarda da residência",
-      "Limpeza pós-sinistro",
-      "Serviços domésticos provisórios",
-      "Orientações por telefone"
+      "Reparos emergenciais elétricos",
+      "Reparos emergenciais hidráulicos", 
+      "Desentupimento",
+      "Chaveiro"
     ],
     limitations: [
-      "Não inclui serviços de encanador",
-      "Não inclui serviços de vidraceiro",
-      "Não inclui mudança e guarda-móveis",
-      "Material e peças não inclusos"
+      "Limitação global de 1 intervenção por mês",
+      "Independente do serviço solicitado",
+      "Agendamento conforme disponibilidade em até 24h após adesão"
     ],
-    availability: "24 horas para emergências",
-    contact: "0800 722 4444",
+    availability: "Agendamento em até 24h após adesão",
+    contact: "0800 704 3837",
+    icon: <MapPin className="w-6 h-6" />
+  },
+  "Assistência Residencial Premium": {
+    name: "Assistência Residencial Premium", 
+    description: "Serviços completos para reparos emergenciais residenciais oferecidos pela Tempo Assistência.",
+    coverage: [
+      "Reparos emergenciais elétricos",
+      "Reparos emergenciais hidráulicos",
+      "Desentupimento", 
+      "Chaveiro",
+      "Conserto de eletrodomésticos",
+      "Assistência à informática"
+    ],
+    limitations: [
+      "Limitação global de 1 intervenção por mês",
+      "Independente do serviço solicitado",
+      "Carência de 48h para assistência de informática",
+      "Agendamento conforme disponibilidade em até 24h após adesão"
+    ],
+    availability: "Agendamento em até 24h após adesão", 
+    contact: "0800 704 3837",
     icon: <MapPin className="w-6 h-6" />
   },
   "Assistência Auto": {
-    name: "Assistência Auto",
-    description: "Socorro automotivo básico para situações de emergência com seu veículo.",
+    name: "Assistência Auto (S.O.S Auto)",
+    description: "Serviços de assistência emergencial veicular oferecidos pela Porto Seguro.",
     coverage: [
-      "Reboque por acidente ou pane",
-      "Socorro por pane mecânica ou elétrica",
-      "Envio de chaveiro automotivo",
-      "Troca de pneus",
-      "Socorro por pane seca (falta de combustível)",
-      "Transmissão de mensagens urgentes"
+      "Mecânico emergencial (carga de bateria, troca de pneu)",
+      "Guincho para utilizar mensalmente"
     ],
     limitations: [
-      "Reboque limitado conforme plano contratado",
-      "Não inclui peças ou combustível",
-      "Cobertura em território nacional",
-      "Sem limite de acionamentos exceto táxi (5x) e lotação (2x)"
+      "1 acionamento por mês",
+      "Acionamento e veículo devem estar em seu nome",
+      "Exceto para Leva e Traz, balanceamento e alinhamento"
     ],
     availability: "24 horas por dia, 7 dias por semana",
-    contact: "0800 722 4444",
+    contact: "3003-3951 (capitais) ou 0800-703-3451 (demais localidades)",
     icon: <Phone className="w-6 h-6" />
   },
   "Assistência Auto Premium": {
-    name: "Assistência Auto Premium",
-    description: "Socorro automotivo completo com serviços adicionais e cobertura estendida.",
+    name: "Assistência Auto Premium (S.O.S Auto Premium)",
+    description: "Serviços completos de assistência emergencial veicular oferecidos pela Porto Seguro.",
     coverage: [
-      "Reboque por acidente ou pane (até 500km)",
-      "Socorro por pane mecânica ou elétrica",
-      "Envio de chaveiro automotivo",
-      "Troca de pneus",
-      "Socorro por pane seca",
-      "Transporte dos ocupantes (sem limite de despesa)",
-      "Remoção para hospital (sem limite)",
-      "Hospedagem para aguardar conserto (R$ 400/dia até 2 dias)",
-      "Serviço de motorista profissional",
-      "Localização e envio de peças",
-      "Assistência residencial inclusa"
+      "Mecânico emergencial",
+      "Guincho (até 50km para motos, 100km para carros)",
+      "Chaveiro",
+      "Leva e traz",
+      "Translado"
     ],
     limitations: [
-      "Não inclui peças ou combustível",
-      "Cobertura: Brasil, Paraguai, Argentina e Uruguai",
-      "Sem limite de acionamentos exceto táxi (5x) e lotação (2x)"
+      "1 acionamento por mês",
+      "Acionamento e veículo devem estar em seu nome",
+      "Exceto para Leva e Traz, balanceamento e alinhamento",
+      "Combinação de serviços caso necessário"
     ],
     availability: "24 horas por dia, 7 dias por semana",
-    contact: "0800 722 4444",
+    contact: "3003-3951 (capitais) ou 0800-703-3451 (demais localidades)",
     icon: <Phone className="w-6 h-6" />
   },
   "Seguro Celular": {
     name: "Seguro Celular",
-    description: "Proteção para seu smartphone contra roubo, furto e danos acidentais.",
+    description: "Proteção contra roubo ou furto qualificado oferecido pela Chubb Seguros.",
     coverage: [
-      "Roubo ou furto qualificado - Reposição por aparelho novo, igual ou similar",
-      "Quebra acidental - Reparo ou reposição por aparelho igual ou similar",
-      "Perda ou roubo de documentos - Reembolso até R$ 500 para segunda via"
+      "Reposição por aparelho igual ou similar (novo ou recondicionado)",
+      "Cobertura para roubo ou furto qualificado",
+      "Aparelhos de até R$ 15.000 e 4 anos de fabricação",
+      "Marcas: Apple, Asus, Samsung, Motorola, LG, Huawei, Xiaomi",
+      "Vigência de 12 meses com renovação automática"
     ],
     limitations: [
-      "Quebra acidental: máximo 2 acionamentos a cada 12 meses",
-      "Roubo ou furto: 1 acionamento a cada 12 meses",
-      "Necessário comunicar outros seguros do mesmo celular",
-      "Aparelho substituto pode ser de cor, modelo ou fabricante diferente"
+      "Franquia de R$ 400,00",
+      "1 evento a cada 12 meses",
+      "Não válido para modelos Flip ou Folder",
+      "Comunicar troca de aparelho imediatamente",
+      "Indenização em até 30 dias"
     ],
-    availability: "Atendimento de sinistros 24h",
-    contact: "0800 722 4824",
+    availability: "Atendimento 24h, 7 dias por semana",
+    contact: "0800 000 0671",
     icon: <Shield className="w-6 h-6" />
   },
   "10 dias sem juros no cheque especial": {
-    name: "10 dias sem juros no cheque especial",
-    description: "Benefício bancário que permite usar o cheque especial sem cobrança de juros por 10 dias.",
+    name: "10 dias sem juros no limite da conta",
+    description: "Benefício que permite usar o limite da conta sem juros por 10 dias corridos.",
     coverage: [
-      "10 dias corridos sem juros",
-      "Válido para todo limite disponível",
+      "10 dias corridos sem juros por mês",
       "Renovação automática mensal",
-      "Sem necessidade de solicitação"
+      "Uso em dias corridos ou alternados",
+      "Contagem considera sábados, domingos e feriados",
+      "Disponível em até 24h após contratação"
     ],
     limitations: [
-      "Válido apenas para clientes Itaú",
-      "Limitado a 10 dias por mês",
-      "Após o período, juros normais se aplicam",
-      "Não acumula dias não utilizados"
+      "Limitado à conta corrente vinculada ao Combinaqui",
+      "Após 10 dias, juros + IOF sobre dias utilizados",
+      "IOF não está isento (imposto federal)",
+      "Não cumulativo com outros benefícios similares",
+      "Sujeito a análise de crédito"
     ],
-    availability: "Disponível mensalmente",
+    availability: "Renovação automática mensal",
+    contact: "4004-4828 (capitais) ou 0800-970-4828 (demais localidades)",
     icon: <Clock className="w-6 h-6" />
   },
-  "Deezer Premium": {
-    name: "Deezer Premium",
-    description: "Streaming de música premium com acesso ilimitado e sem anúncios.",
-    coverage: [
-      "Mais de 90 milhões de músicas",
-      "Reprodução offline",
-      "Qualidade de áudio Hi-Fi",
-      "Sem anúncios",
-      "Playlists personalizadas",
-      "Letras das músicas",
-      "Acesso simultâneo em múltiplos dispositivos"
-    ],
-    limitations: [
-      "Restrito a 1 conta por titular",
-      "Não pode ser compartilhado",
-      "Cancelamento junto com o Combinaqui"
-    ],
-    availability: "24 horas por dia, 7 dias por semana",
-    icon: <Shield className="w-6 h-6" />
-  },
   "500MB de Internet Extra": {
-    name: "500MB de Internet Extra",
-    description: "Pacote adicional de dados móveis para seu plano de celular.",
+    name: "500MB de Internet Extra (Bônus Internet)",
+    description: "Concessão de 500MB de internet para operadoras Vivo, Claro e Tim.",
     coverage: [
       "500MB de dados móveis",
-      "Válido para qualquer operadora",
-      "Recarga automática mensal",
-      "Notificação de uso"
+      "Válido para Vivo (exceto Vivo Easy), Claro e Tim",
+      "Planos pré-pago, pós-pago e Controle",
+      "Validade de 30 dias",
+      "Velocidade 4G até 5 Mbps download e 500 Kbps upload"
     ],
     limitations: [
-      "Válido apenas para uma linha",
-      "Não acumula com mês seguinte",
-      "Sujeito à disponibilidade da operadora"
+      "Não conveniado: Nextel e OI",
+      "Não acumula para o mês seguinte", 
+      "Consumido junto com outros bônus (Vivo/Tim)",
+      "Concedido antes da franquia (Claro)",
+      "Linha deve estar ativa conforme regra da operadora"
     ],
-    availability: "Recarga automática mensal",
+    availability: "Concessão mensal automática",
     icon: <Phone className="w-6 h-6" />
   },
   "1GB de Internet Extra": {
-    name: "1GB de Internet Extra",
-    description: "Pacote adicional de dados móveis para seu plano de celular.",
+    name: "1GB de Internet Extra (Bônus Internet)",
+    description: "Concessão de 1GB de internet para operadoras Vivo, Claro e Tim.",
     coverage: [
-      "1GB de dados móveis",
-      "Válido para qualquer operadora",
-      "Recarga automática mensal",
-      "Notificação de uso"
+      "1GB de dados móveis", 
+      "Válido para Vivo (exceto Vivo Easy), Claro e Tim",
+      "Planos pré-pago, pós-pago e Controle",
+      "Validade de 30 dias",
+      "Velocidade 4G até 5 Mbps download e 500 Kbps upload"
     ],
     limitations: [
-      "Válido apenas para uma linha",
-      "Não acumula com mês seguinte",
-      "Sujeito à disponibilidade da operadora"
+      "Não conveniado: Nextel e OI",
+      "Não acumula para o mês seguinte",
+      "Consumido junto com outros bônus (Vivo/Tim)", 
+      "Concedido antes da franquia (Claro)",
+      "Linha deve estar ativa conforme regra da operadora"
     ],
-    availability: "Recarga automática mensal",
+    availability: "Concessão mensal automática",
     icon: <Phone className="w-6 h-6" />
   },
   "5% de Cashback nas contas de consumo": {
     name: "5% de Cashback nas contas de consumo",
-    description: "Retorno de 5% do valor pago em contas de consumo em débito automático.",
+    description: "Retorno de 5% do valor pago em contas de consumo cadastradas em débito automático.",
     coverage: [
-      "5% de cashback em contas de luz",
-      "5% de cashback em contas de água",
-      "5% de cashback em contas de gás",
-      "5% de cashback em telefone/internet",
-      "Crédito automático na conta corrente"
+      "5% sobre contas de luz, água, gás, internet e TV a cabo",
+      "Contas em débito automático e efetivamente pagas",
+      "Crédito até o 7º dia útil do mês subsequente",
+      "Válido apenas para contas cadastradas após adesão ao Combinaqui"
     ],
     limitations: [
-      "Apenas contas em débito automático",
-      "Máximo de R$ 50 de cashback por mês",
-      "Não válido para financiamentos",
-      "Sujeito a regulamentação específica"
+      "Máximo de R$ 100,00 por mês",
+      "Conta deve estar ativa sem restrições",
+      "Não concedido em caso de inadimplência",
+      "Cancelamento do Combinaqui cancela o benefício"
     ],
-    availability: "Crédito mensal automático",
+    availability: "Crédito automático mensal",
     icon: <Check className="w-6 h-6" />
   }
 };
