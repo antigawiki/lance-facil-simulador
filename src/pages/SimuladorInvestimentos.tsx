@@ -197,14 +197,17 @@ const SimuladorInvestimentos = () => {
 
   // Gerar dados para comparação final
   const generateComparisonData = () => {
-    return investmentOptions.map(investment => {
-      const result = calculateInvestmentValue(investment, prazoMeses);
-      return {
-        name: investment.name,
-        value: result.netValue,
-        color: investment.color
-      };
-    });
+    return investmentOptions
+      .map(investment => {
+        const result = calculateInvestmentValue(investment, prazoMeses);
+        return {
+          name: investment.name,
+          value: result.netValue,
+          color: investment.color,
+          netProfitability: result.netProfitability
+        };
+      })
+      .sort((a, b) => b.netProfitability - a.netProfitability);
   };
 
   const handleSimulate = () => {
@@ -286,9 +289,11 @@ const SimuladorInvestimentos = () => {
       </div>
 
       <div style="margin-bottom: 30px;">
-        <h2 style="color: #ff6600; font-size: 22px; margin: 0 0 20px 0;">Resultados por Investimento</h2>
-        ${investmentOptions.map(investment => {
-          const result = calculateInvestmentValue(investment, prazoMeses);
+        <h2 style="color: #ff6600; font-size: 22px; margin: 0 0 20px 0;">Resultados por Investimento (Ordenado por Rentabilidade)</h2>
+        ${investmentOptions
+          .map(investment => ({ investment, result: calculateInvestmentValue(investment, prazoMeses) }))
+          .sort((a, b) => b.result.netProfitability - a.result.netProfitability)
+          .map(({ investment, result }) => {
           return `
             <div style="background: #f8f9fa; margin-bottom: 15px; padding: 20px; border-radius: 8px; border-left: 5px solid ${investment.color};">
               <h3 style="color: ${investment.color}; margin: 0 0 10px 0; font-size: 18px;">${investment.name}</h3>
@@ -550,8 +555,13 @@ const SimuladorInvestimentos = () => {
               <div className="space-y-6" ref={printRef}>
                 {/* Cards de Resultado */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {investmentOptions.map((investment) => {
-                    const result = calculateInvestmentValue(investment, prazoMeses);
+                  {investmentOptions
+                    .map((investment) => ({
+                      investment,
+                      result: calculateInvestmentValue(investment, prazoMeses)
+                    }))
+                    .sort((a, b) => b.result.netProfitability - a.result.netProfitability)
+                    .map(({ investment, result }) => {
                     return (
                       <Card key={investment.name} className="border-l-4" style={{ borderLeftColor: investment.color }}>
                         <CardHeader className="pb-2">
