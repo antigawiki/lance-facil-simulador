@@ -148,7 +148,8 @@ const SimuladorInvestimentos = () => {
 
   // Função para calcular rendimento com juros compostos
   const calculateInvestmentValue = (investment: InvestmentOption, months: number) => {
-    const monthlyRate = investment.annualRate / 100 / 12;
+    // Conversão correta da taxa anual para mensal usando juros compostos
+    const monthlyRate = Math.pow(1 + investment.annualRate / 100, 1/12) - 1;
     const totalInvested = valorInicial + (aporteMenusal * months);
     
     // Fórmula de juros compostos com aportes mensais
