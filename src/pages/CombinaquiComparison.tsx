@@ -6,7 +6,8 @@ import { ArrowLeft, Download, Check, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import ServiceInfoModal from "@/components/ServiceInfoModal";
 import itauLogo from "@/assets/itau-logo.png";
 
 const combinaquiData = {
@@ -134,6 +135,8 @@ const CombinaquiComparison = () => {
   const { id } = useParams();
   const { toast } = useToast();
   const printRef = useRef<HTMLDivElement>(null);
+  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const plan = combinaquiData[id as keyof typeof combinaquiData];
 
@@ -193,6 +196,16 @@ const CombinaquiComparison = () => {
     }
   };
 
+  const handleServiceClick = (serviceName: string) => {
+    setSelectedService(serviceName);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedService(null);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
       <div className="container mx-auto px-4 py-8">
@@ -233,7 +246,12 @@ const CombinaquiComparison = () => {
                     <div key={index} className="flex items-center justify-between py-3 border-b border-border/50 last:border-0">
                       <div className="flex items-center gap-3">
                         <Check className="w-5 h-5 text-green-500" />
-                        <span className="font-medium">{service.name}</span>
+                        <button 
+                          onClick={() => handleServiceClick(service.name)}
+                          className="font-medium text-left hover:text-primary transition-colors cursor-pointer underline decoration-dotted underline-offset-4"
+                        >
+                          {service.name}
+                        </button>
                       </div>
                       <div className="text-right">
                         <div className="text-sm text-muted-foreground">Preço avulso</div>
@@ -302,6 +320,12 @@ const CombinaquiComparison = () => {
             </div>
           </div>
         </div>
+        
+        <ServiceInfoModal 
+          serviceName={selectedService}
+          isOpen={isModalOpen}
+          onClose={closeModal}
+        />
       </div>
     </div>
   );
