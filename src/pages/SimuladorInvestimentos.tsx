@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Download, RefreshCw, TrendingUp, Settings } from "lucide-react";
@@ -504,6 +504,21 @@ const SimuladorInvestimentos = () => {
                                   value={config.type}
                                   onValueChange={(value: "cdi" | "fixed") => {
                                     const newConfigs = [...investmentConfigs];
+                                    const cdiRate = getCDIRate(selicRate);
+                                    
+                                    // Converter valor automaticamente
+                                    if (value === "cdi" && config.type === "fixed") {
+                                      // Converter taxa fixa para % do CDI
+                                      const cdiPercentage = Math.round((config.fixedRate! / cdiRate) * 100);
+                                      newConfigs[index].cdiPercentage = cdiPercentage;
+                                      delete newConfigs[index].fixedRate;
+                                    } else if (value === "fixed" && config.type === "cdi") {
+                                      // Converter % do CDI para taxa fixa
+                                      const fixedRate = Number(((config.cdiPercentage! / 100) * cdiRate).toFixed(2));
+                                      newConfigs[index].fixedRate = fixedRate;
+                                      delete newConfigs[index].cdiPercentage;
+                                    }
+                                    
                                     newConfigs[index].type = value;
                                     setInvestmentConfigs(newConfigs);
                                   }}
@@ -539,10 +554,15 @@ const SimuladorInvestimentos = () => {
                                 />
                               </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
-                    </DialogContent>
+                           </div>
+                         ))}
+                       </div>
+                       <div className="flex justify-end pt-4 border-t">
+                         <DialogClose asChild>
+                           <Button>Salvar Configurações</Button>
+                         </DialogClose>
+                       </div>
+                     </DialogContent>
                   </Dialog>
                 </CardTitle>
               </CardHeader>
