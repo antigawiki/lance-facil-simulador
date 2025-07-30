@@ -211,6 +211,27 @@ const servicesInfo: Record<string, ServiceInfo> = {
     ],
     availability: "Crédito automático mensal",
     icon: <Check className="w-6 h-6" />
+  },
+  "Deezer Premium": {
+    name: "Deezer Premium",
+    description: "Plano Premium da Deezer com acesso completo a músicas, playlists e podcasts.",
+    coverage: [
+      "Mais de 56 milhões de músicas",
+      "Acesso a milhares de playlists",
+      "Criação das suas próprias playlists",
+      "Podcasts e rádios ao vivo",
+      "Download de conteúdos para ouvir offline",
+      "Sem propagandas ou interrupções",
+      "Alta qualidade de áudio"
+    ],
+    limitations: [
+      "Conta vinculada ao telefone celular informado na adesão",
+      "Uso em rede móvel sujeito à franquia de dados do plano",
+      "Sujeito aos Termos de Uso da Deezer",
+      "Cancelamento junto com o Combinaqui"
+    ],
+    availability: "24 horas por dia, 7 dias por semana",
+    icon: <Shield className="w-6 h-6" />
   }
 };
 
