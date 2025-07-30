@@ -32,94 +32,92 @@ const servicesInfo: Record<string, ServiceInfo> = {
       "Limitado a orientações e informações"
     ],
     availability: "24 horas por dia, 7 dias por semana",
-    contact: "0800 702 5050",
+    contact: "0800 722 4444",
     icon: <Shield className="w-6 h-6" />
   },
   "Assistência Residencial Clássica": {
     name: "Assistência Residencial Clássica",
-    description: "Serviços de emergência residencial para resolver problemas domésticos básicos.",
+    description: "Serviços de assistência residencial para emergências domésticas.",
     coverage: [
       "Chaveiro 24h (perda ou quebra de chaves)",
       "Eletricista para emergências",
-      "Encanador para vazamentos",
-      "Vidraceiro para vidros quebrados",
-      "Desentupimento de pias e vasos",
-      "Serviços de limpeza pós-sinistro",
+      "Guarda da residência",
+      "Limpeza pós-sinistro",
+      "Serviços domésticos provisórios",
       "Orientações por telefone"
     ],
     limitations: [
-      "Limitado a 4 acionamentos por ano",
-      "Franquia de até R$ 150 por serviço",
-      "Não inclui material ou peças",
-      "Apenas emergências residenciais"
+      "Não inclui serviços de encanador",
+      "Não inclui serviços de vidraceiro",
+      "Não inclui mudança e guarda-móveis",
+      "Material e peças não inclusos"
     ],
-    availability: "24 horas para emergências, horário comercial para demais serviços",
-    contact: "0800 702 5050",
+    availability: "24 horas para emergências",
+    contact: "0800 722 4444",
     icon: <MapPin className="w-6 h-6" />
   },
   "Assistência Auto": {
     name: "Assistência Auto",
-    description: "Socorro automotivo para situações de emergência com seu veículo.",
+    description: "Socorro automotivo básico para situações de emergência com seu veículo.",
     coverage: [
-      "Guincho para reboque (até 100km)",
-      "Socorro por pane seca",
-      "Troca de pneu furado",
-      "Chaveiro automotivo",
-      "Socorro por pane elétrica básica",
-      "Orientações por telefone"
+      "Reboque por acidente ou pane",
+      "Socorro por pane mecânica ou elétrica",
+      "Envio de chaveiro automotivo",
+      "Troca de pneus",
+      "Socorro por pane seca (falta de combustível)",
+      "Transmissão de mensagens urgentes"
     ],
     limitations: [
-      "Limitado a 6 acionamentos por ano",
+      "Reboque limitado conforme plano contratado",
       "Não inclui peças ou combustível",
-      "Veículos até 10 anos de fabricação",
-      "Cobertura em território nacional"
+      "Cobertura em território nacional",
+      "Sem limite de acionamentos exceto táxi (5x) e lotação (2x)"
     ],
     availability: "24 horas por dia, 7 dias por semana",
-    contact: "0800 702 5050",
+    contact: "0800 722 4444",
     icon: <Phone className="w-6 h-6" />
   },
   "Assistência Auto Premium": {
     name: "Assistência Auto Premium",
-    description: "Socorro automotivo completo com serviços adicionais e maior cobertura.",
+    description: "Socorro automotivo completo com serviços adicionais e cobertura estendida.",
     coverage: [
-      "Guincho para reboque (até 200km)",
+      "Reboque por acidente ou pane (até 500km)",
+      "Socorro por pane mecânica ou elétrica",
+      "Envio de chaveiro automotivo",
+      "Troca de pneus",
       "Socorro por pane seca",
-      "Troca de pneu furado",
-      "Chaveiro automotivo",
-      "Socorro por pane elétrica e mecânica",
-      "Carro reserva (até 3 dias)",
-      "Hospedagem em caso de viagem",
-      "Motorista substituto",
-      "Orientações por telefone"
+      "Transporte dos ocupantes (sem limite de despesa)",
+      "Remoção para hospital (sem limite)",
+      "Hospedagem para aguardar conserto (R$ 400/dia até 2 dias)",
+      "Serviço de motorista profissional",
+      "Localização e envio de peças",
+      "Assistência residencial inclusa"
     ],
     limitations: [
-      "Limitado a 10 acionamentos por ano",
       "Não inclui peças ou combustível",
-      "Veículos até 15 anos de fabricação",
-      "Cobertura em território nacional"
+      "Cobertura: Brasil, Paraguai, Argentina e Uruguai",
+      "Sem limite de acionamentos exceto táxi (5x) e lotação (2x)"
     ],
     availability: "24 horas por dia, 7 dias por semana",
-    contact: "0800 702 5050",
+    contact: "0800 722 4444",
     icon: <Phone className="w-6 h-6" />
   },
   "Seguro Celular": {
     name: "Seguro Celular",
-    description: "Proteção para seu smartphone contra danos acidentais, roubo e furto.",
+    description: "Proteção para seu smartphone contra roubo, furto e danos acidentais.",
     coverage: [
-      "Cobertura contra danos acidentais",
-      "Proteção contra roubo e furto",
-      "Reposição por aparelho similar",
-      "Cobertura para acessórios originais",
-      "Atendimento 24h para sinistros"
+      "Roubo ou furto qualificado - Reposição por aparelho novo, igual ou similar",
+      "Quebra acidental - Reparo ou reposição por aparelho igual ou similar",
+      "Perda ou roubo de documentos - Reembolso até R$ 500 para segunda via"
     ],
     limitations: [
-      "Aparelhos com até 2 anos de uso",
-      "Franquia de 10% do valor do aparelho",
-      "Máximo 2 sinistros por ano",
-      "Não cobre danos por uso inadequado"
+      "Quebra acidental: máximo 2 acionamentos a cada 12 meses",
+      "Roubo ou furto: 1 acionamento a cada 12 meses",
+      "Necessário comunicar outros seguros do mesmo celular",
+      "Aparelho substituto pode ser de cor, modelo ou fabricante diferente"
     ],
     availability: "Atendimento de sinistros 24h",
-    contact: "0800 702 5050",
+    contact: "0800 722 4824",
     icon: <Shield className="w-6 h-6" />
   },
   "10 dias sem juros no cheque especial": {
