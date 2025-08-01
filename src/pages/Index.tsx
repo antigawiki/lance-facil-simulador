@@ -84,6 +84,24 @@ const Index = () => {
           ))}
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-background border-t border-border py-8">
+        <div className="container mx-auto px-4 text-center">
+          <div className="mb-4">
+            <a 
+              href="/feedback" 
+              className="text-primary hover:text-primary/80 font-medium underline transition-colors"
+            >
+              Sugestões, críticas ou elogios clique aqui
+            </a>
+          </div>
+          <div className="text-sm text-muted-foreground">
+            <p className="mb-1">Ituber 2025, todos os direitos reservados.</p>
+            <p>Nenhuma informação contida aqui é sigilosa. Todas podem ser encontradas no site do Itaú.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
