@@ -32,8 +32,22 @@ const Feedback = () => {
     setIsSubmitting(true);
 
     try {
-      // Simulação de envio de email
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Enviar email através da Edge Function do Supabase
+      const response = await fetch('/api/v1/functions/send-feedback-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          subject,
+          message
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Falha ao enviar email');
+      }
       
       toast({
         title: "Mensagem enviada com sucesso!",
