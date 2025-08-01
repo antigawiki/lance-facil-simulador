@@ -26,65 +26,104 @@ interface Coverage {
 
 const coverages: Coverage[] = [
   {
-    id: "morte",
-    name: "Morte Qualquer Causa",
-    description: "Garante ao beneficiário o pagamento do valor contratado no caso de morte por doença, velhice ou acidente.",
-    basePrice: 0.85, // R$ 0.85 per R$ 1,000
-    icon: Shield,
-    required: true,
-    defaultAmount: 100000,
-    minAmount: 10000,
-    maxAmount: 1000000
-  },
-  {
-    id: "invalidez",
-    name: "Invalidez Permanente por Acidente", 
-    description: "Garante pagamento no caso de invalidez funcional definitiva causada por acidente pessoal.",
-    basePrice: 0.45,
+    id: "morte-acidental",
+    name: "Morte Acidental",
+    description: "Garante ao beneficiário o pagamento no caso de morte por acidente.",
+    basePrice: 0.15, // R$ 0.15 per R$ 1,000
     icon: AlertTriangle,
     defaultAmount: 50000,
-    minAmount: 10000,
-    maxAmount: 500000
-  },
-  {
-    id: "doencas",
-    name: "Doenças Graves",
-    description: "Indenização em caso de primeiro diagnóstico de câncer, infarto, AVC, insuficiência renal ou transplante de órgãos.",
-    basePrice: 1.20,
-    icon: Heart,
-    defaultAmount: 80000,
-    minAmount: 10000,
+    minAmount: 5000,
     maxAmount: 300000
   },
   {
-    id: "avaliacao",
-    name: "Avaliação Clínica Preventiva",
-    description: "Consulta médica com clínico geral e exames laboratoriais (2 acionamentos por vigência).",
-    basePrice: 18.50, // Valor fixo mensal
-    icon: Heart,
-    defaultAmount: 1,
-    minAmount: 1,
-    maxAmount: 1
+    id: "invalidez-acidente",
+    name: "Invalidez Permanente por Acidente", 
+    description: "Garante pagamento no caso de invalidez funcional definitiva causada por acidente pessoal.",
+    basePrice: 0.25,
+    icon: AlertTriangle,
+    defaultAmount: 30000,
+    minAmount: 5000,
+    maxAmount: 150000
   },
   {
-    id: "funeral",
-    name: "Assistência Funeral Familiar",
-    description: "Conjunto de serviços para o segurado, cônjuge e filhos com até 21 anos em todo território nacional.",
-    basePrice: 24.90, // Valor fixo mensal
+    id: "morte-qualquer-causa",
+    name: "Morte por Qualquer Causa",
+    description: "Garante ao beneficiário o pagamento no caso de morte por doença, velhice ou acidente.",
+    basePrice: 0.45, // R$ 0.45 per R$ 1,000
     icon: Shield,
-    defaultAmount: 1,
-    minAmount: 1,
-    maxAmount: 1
+    defaultAmount: 50000,
+    minAmount: 5000,
+    maxAmount: 300000
   },
   {
-    id: "assistencia24h",
-    name: "Assistência 24h",
-    description: "Serviço telefônico para orientações e auxílio no cancelamento de cartões, documentos, etc.",
-    basePrice: 12.50, // Valor fixo mensal
-    icon: Phone,
-    defaultAmount: 1,
-    minAmount: 1,
-    maxAmount: 1
+    id: "diaria-acidente",
+    name: "Diária de Internação por Acidente",
+    description: "Pagamento de diária durante internação hospitalar decorrente de acidente.",
+    basePrice: 0.80, // R$ 0.80 por R$ 1 de diária
+    icon: Home,
+    defaultAmount: 100, // R$ 100/dia
+    minAmount: 25,
+    maxAmount: 300
+  },
+  {
+    id: "diaria-doenca",
+    name: "Diária de Internação por Doença",
+    description: "Pagamento de diária durante internação hospitalar decorrente de doença.",
+    basePrice: 1.20, // R$ 1.20 por R$ 1 de diária
+    icon: Home,
+    defaultAmount: 100, // R$ 100/dia
+    minAmount: 25,
+    maxAmount: 300
+  },
+  {
+    id: "quebra-ossos",
+    name: "Quebra de Ossos",
+    description: "Indenização em caso de fratura óssea decorrente de acidente pessoal.",
+    basePrice: 0.35,
+    icon: Heart,
+    defaultAmount: 2000,
+    minAmount: 500,
+    maxAmount: 5000
+  },
+  {
+    id: "doencas-graves",
+    name: "Doenças Graves",
+    description: "Indenização em caso de primeiro diagnóstico de câncer, infarto, AVC, insuficiência renal ou transplante de órgãos.",
+    basePrice: 0.85,
+    icon: Heart,
+    defaultAmount: 30000,
+    minAmount: 5000,
+    maxAmount: 150000
+  },
+  {
+    id: "funeral-segurado",
+    name: "Auxílio Funeral do Segurado",
+    description: "Auxílio para despesas de funeral do segurado - Valor fixo de R$ 5.000.",
+    basePrice: 8.90, // Valor fixo mensal
+    icon: Shield,
+    defaultAmount: 5000,
+    minAmount: 5000,
+    maxAmount: 5000
+  },
+  {
+    id: "funeral-conjuge-filhos",
+    name: "Auxílio Funeral Cônjuge e Filhos",
+    description: "Auxílio para despesas de funeral do cônjuge e filhos - Valor fixo de R$ 5.000.",
+    basePrice: 6.50, // Valor fixo mensal
+    icon: Shield,
+    defaultAmount: 5000,
+    minAmount: 5000,
+    maxAmount: 5000
+  },
+  {
+    id: "funeral-pais",
+    name: "Auxílio Funeral dos Pais",
+    description: "Auxílio para despesas de funeral dos pais do segurado - Valor fixo de R$ 5.000.",
+    basePrice: 4.90, // Valor fixo mensal
+    icon: Shield,
+    defaultAmount: 5000,
+    minAmount: 5000,
+    maxAmount: 5000
   }
 ];
 
@@ -95,40 +134,36 @@ const Seguros = () => {
   
   const [age, setAge] = useState("");
   const [months, setMonths] = useState("");
-  const [selectedCoverages, setSelectedCoverages] = useState<string[]>(["morte"]);
-  const [coverageAmounts, setCoverageAmounts] = useState<{[key: string]: number}>({
-    morte: 100000,
-    invalidez: 50000,
-    doencas: 80000,
-    avaliacao: 1,
-    funeral: 1,
-    assistencia24h: 1
-  });
+  const [selectedCoverages, setSelectedCoverages] = useState<string[]>([]);
+  const [coverageAmounts, setCoverageAmounts] = useState<{[key: string]: number}>({});
   const [showSimulation, setShowSimulation] = useState(false);
 
   const calculatePrice = (coverage: Coverage, ageValue: number, coverageAmount: number) => {
-    // Para coberturas de valor fixo (avaliação, funeral, assistência)
-    if (coverage.id === "avaliacao" || coverage.id === "funeral" || coverage.id === "assistencia24h") {
+    // Para coberturas de valor fixo (auxílios funeral)
+    if (coverage.id.includes("funeral")) {
       return coverage.basePrice;
     }
 
-    // Fator de idade baseado em faixas etárias reais de seguros
+    // Fator de idade baseado em pesquisa de mercado brasileiro
     let ageFactor = 1;
-    if (ageValue >= 18 && ageValue <= 30) ageFactor = 0.8;
-    else if (ageValue >= 31 && ageValue <= 40) ageFactor = 1.0;
-    else if (ageValue >= 41 && ageValue <= 50) ageFactor = 1.4;
-    else if (ageValue >= 51 && ageValue <= 60) ageFactor = 2.2;
-    else if (ageValue >= 61 && ageValue <= 70) ageFactor = 3.5;
-    else if (ageValue > 70) ageFactor = 5.2;
+    if (ageValue >= 18 && ageValue <= 25) ageFactor = 0.6;
+    else if (ageValue >= 26 && ageValue <= 35) ageFactor = 0.8;
+    else if (ageValue >= 36 && ageValue <= 45) ageFactor = 1.2;
+    else if (ageValue >= 46 && ageValue <= 55) ageFactor = 1.8;
+    else if (ageValue >= 56 && ageValue <= 65) ageFactor = 2.8;
+    else if (ageValue > 65) ageFactor = 4.2;
 
-    // Calcular preço por mil de cobertura
+    // Para diárias, calcular por valor da diária
+    if (coverage.id.includes("diaria")) {
+      return coverage.basePrice * ageFactor * coverageAmount;
+    }
+
+    // Calcular preço por mil de cobertura para outros tipos
     const pricePerThousand = coverage.basePrice * ageFactor;
     return (pricePerThousand * coverageAmount) / 1000;
   };
 
   const handleCoverageToggle = (coverageId: string) => {
-    if (coverageId === "morte") return; // Morte é obrigatória
-    
     setSelectedCoverages(prev =>
       prev.includes(coverageId)
         ? prev.filter(id => id !== coverageId)
@@ -146,10 +181,19 @@ const Seguros = () => {
       return;
     }
 
-    if (!months || parseInt(months) < 0 || parseInt(months) > 11) {
+    if (months && (parseInt(months) < 0 || parseInt(months) > 11)) {
       toast({
         title: "Meses inválidos",
         description: "Os meses devem estar entre 0 e 11.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (selectedCoverages.length === 0) {
+      toast({
+        title: "Selecione pelo menos uma cobertura",
+        description: "É necessário selecionar ao menos uma cobertura para simular.",
         variant: "destructive",
       });
       return;
@@ -398,9 +442,6 @@ const Seguros = () => {
                                  <Label htmlFor={coverage.id} className="font-medium cursor-pointer">
                                    {coverage.name}
                                  </Label>
-                                 {coverage.required && (
-                                   <Badge variant="secondary" className="text-xs">Obrigatória</Badge>
-                                 )}
                                </div>
                                <p className="text-sm text-muted-foreground mb-2">{coverage.description}</p>
                                <p className="text-sm font-semibold text-primary">
@@ -408,23 +449,23 @@ const Seguros = () => {
                                </p>
                              </div>
                            </div>
-                           {coverage.id !== "avaliacao" && coverage.id !== "funeral" && coverage.id !== "assistencia24h" && (
-                             <div className="ml-7">
-                               <Label htmlFor={`amount-${coverage.id}`} className="text-xs">
-                                 Valor da Cobertura (R$)
-                               </Label>
-                               <Input
-                                 id={`amount-${coverage.id}`}
-                                 type="number"
-                                 value={currentAmount}
-                                 onChange={(e) => setCoverageAmounts(prev => ({
-                                   ...prev,
-                                   [coverage.id]: parseInt(e.target.value) || coverage.defaultAmount
-                                 }))}
-                                 min={coverage.minAmount}
-                                 max={coverage.maxAmount}
-                                 step="1000"
-                                 className="mt-1"
+                            {!coverage.id.includes("funeral") && (
+                              <div className="ml-7">
+                                <Label htmlFor={`amount-${coverage.id}`} className="text-xs">
+                                  {coverage.id.includes("diaria") ? "Valor da Diária (R$)" : "Valor da Cobertura (R$)"}
+                                </Label>
+                                <Input
+                                  id={`amount-${coverage.id}`}
+                                  type="number"
+                                  value={currentAmount}
+                                  onChange={(e) => setCoverageAmounts(prev => ({
+                                    ...prev,
+                                    [coverage.id]: parseInt(e.target.value) || coverage.defaultAmount
+                                  }))}
+                                  min={coverage.minAmount}
+                                  max={coverage.maxAmount}
+                                  step={coverage.id.includes("diaria") ? "25" : "1000"}
+                                  className="mt-1"
                                />
                                <p className="text-xs text-muted-foreground mt-1">
                                  Min: R$ {coverage.minAmount.toLocaleString('pt-BR')} | 

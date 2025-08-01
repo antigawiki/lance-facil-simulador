@@ -117,9 +117,9 @@ const SimuladorInvestimentos = () => {
   const { toast } = useToast();
   const printRef = useRef<HTMLDivElement>(null);
   
-  const [valorInicial, setValorInicial] = useState<number>(10000);
-  const [aporteMenusal, setAporteMenusal] = useState<number>(1000);
-  const [prazoMeses, setPrazoMeses] = useState<number>(60);
+  const [valorInicial, setValorInicial] = useState<number>(0);
+  const [aporteMenusal, setAporteMenusal] = useState<number>(0);
+  const [prazoMeses, setPrazoMeses] = useState<number>(0);
   const [selicRate, setSelicRate] = useState<number>(15.0);
   const [showResults, setShowResults] = useState(false);
   const [investmentConfigs, setInvestmentConfigs] = useState<InvestmentConfig[]>(getDefaultInvestmentConfigs());
@@ -441,8 +441,9 @@ const SimuladorInvestimentos = () => {
                   <Input
                     id="valorInicial"
                     type="number"
-                    value={valorInicial}
-                    onChange={(e) => setValorInicial(Number(e.target.value))}
+                    value={valorInicial || ""}
+                    onChange={(e) => setValorInicial(Number(e.target.value) || 0)}
+                    placeholder="Ex: 10000"
                     min="0"
                     step="1000"
                   />
@@ -453,8 +454,9 @@ const SimuladorInvestimentos = () => {
                   <Input
                     id="aporteMenusal"
                     type="number"
-                    value={aporteMenusal}
-                    onChange={(e) => setAporteMenusal(Number(e.target.value))}
+                    value={aporteMenusal || ""}
+                    onChange={(e) => setAporteMenusal(Number(e.target.value) || 0)}
+                    placeholder="Ex: 1000"
                     min="0"
                     step="100"
                   />
@@ -465,8 +467,9 @@ const SimuladorInvestimentos = () => {
                   <Input
                     id="prazoMeses"
                     type="number"
-                    value={prazoMeses}
-                    onChange={(e) => setPrazoMeses(Number(e.target.value))}
+                    value={prazoMeses || ""}
+                    onChange={(e) => setPrazoMeses(Number(e.target.value) || 0)}
+                    placeholder="Ex: 60"
                     min="1"
                     max="360"
                   />
