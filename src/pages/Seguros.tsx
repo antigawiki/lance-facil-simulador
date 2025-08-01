@@ -29,7 +29,7 @@ const coverages: Coverage[] = [
     id: "morte-acidental",
     name: "Morte Acidental",
     description: "Garante ao beneficiário o pagamento no caso de morte por acidente.",
-    basePrice: 0.15, // R$ 0.15 per R$ 1,000
+    basePrice: 0.12, // R$ 0.12 per R$ 1,000 - ajustado conforme pesquisa de mercado
     icon: AlertTriangle,
     defaultAmount: 50000,
     minAmount: 5000,
@@ -39,7 +39,7 @@ const coverages: Coverage[] = [
     id: "invalidez-acidente",
     name: "Invalidez Permanente por Acidente", 
     description: "Garante pagamento no caso de invalidez funcional definitiva causada por acidente pessoal.",
-    basePrice: 0.25,
+    basePrice: 0.18,
     icon: AlertTriangle,
     defaultAmount: 30000,
     minAmount: 5000,
@@ -49,7 +49,7 @@ const coverages: Coverage[] = [
     id: "morte-qualquer-causa",
     name: "Morte por Qualquer Causa",
     description: "Garante ao beneficiário o pagamento no caso de morte por doença, velhice ou acidente.",
-    basePrice: 0.45, // R$ 0.45 per R$ 1,000
+    basePrice: 0.35, // R$ 0.35 per R$ 1,000 - ajustado conforme pesquisa
     icon: Shield,
     defaultAmount: 50000,
     minAmount: 5000,
@@ -59,7 +59,7 @@ const coverages: Coverage[] = [
     id: "diaria-acidente",
     name: "Diária de Internação por Acidente",
     description: "Pagamento de diária durante internação hospitalar decorrente de acidente.",
-    basePrice: 0.80, // R$ 0.80 por R$ 1 de diária
+    basePrice: 0.25, // R$ 0.25 por R$ 1 de diária - muito mais baixo conforme mercado
     icon: Home,
     defaultAmount: 100, // R$ 100/dia
     minAmount: 25,
@@ -69,7 +69,7 @@ const coverages: Coverage[] = [
     id: "diaria-doenca",
     name: "Diária de Internação por Doença",
     description: "Pagamento de diária durante internação hospitalar decorrente de doença.",
-    basePrice: 1.20, // R$ 1.20 por R$ 1 de diária
+    basePrice: 0.35, // R$ 0.35 por R$ 1 de diária - ajustado para baixo
     icon: Home,
     defaultAmount: 100, // R$ 100/dia
     minAmount: 25,
@@ -79,7 +79,7 @@ const coverages: Coverage[] = [
     id: "quebra-ossos",
     name: "Quebra de Ossos",
     description: "Indenização em caso de fratura óssea decorrente de acidente pessoal.",
-    basePrice: 0.35,
+    basePrice: 0.28,
     icon: Heart,
     defaultAmount: 2000,
     minAmount: 500,
@@ -89,7 +89,7 @@ const coverages: Coverage[] = [
     id: "doencas-graves",
     name: "Doenças Graves",
     description: "Indenização em caso de primeiro diagnóstico de câncer, infarto, AVC, insuficiência renal ou transplante de órgãos.",
-    basePrice: 0.85,
+    basePrice: 0.65,
     icon: Heart,
     defaultAmount: 30000,
     minAmount: 5000,
@@ -99,7 +99,7 @@ const coverages: Coverage[] = [
     id: "funeral-segurado",
     name: "Auxílio Funeral do Segurado",
     description: "Auxílio para despesas de funeral do segurado - Valor fixo de R$ 5.000.",
-    basePrice: 8.90, // Valor fixo mensal
+    basePrice: 4.50, // Valor fixo mensal - ajustado para baixo
     icon: Shield,
     defaultAmount: 5000,
     minAmount: 5000,
@@ -109,7 +109,7 @@ const coverages: Coverage[] = [
     id: "funeral-conjuge-filhos",
     name: "Auxílio Funeral Cônjuge e Filhos",
     description: "Auxílio para despesas de funeral do cônjuge e filhos - Valor fixo de R$ 5.000.",
-    basePrice: 6.50, // Valor fixo mensal
+    basePrice: 3.20, // Valor fixo mensal - ajustado para baixo
     icon: Shield,
     defaultAmount: 5000,
     minAmount: 5000,
@@ -119,7 +119,7 @@ const coverages: Coverage[] = [
     id: "funeral-pais",
     name: "Auxílio Funeral dos Pais",
     description: "Auxílio para despesas de funeral dos pais do segurado - Valor fixo de R$ 5.000.",
-    basePrice: 4.90, // Valor fixo mensal
+    basePrice: 8.90, // Valor fixo mensal - o mais caro conforme solicitado
     icon: Shield,
     defaultAmount: 5000,
     minAmount: 5000,
@@ -424,7 +424,7 @@ const Seguros = () => {
                      {coverages.map((coverage) => {
                        const Icon = coverage.icon;
                        const isSelected = selectedCoverages.includes(coverage.id);
-                       const currentAmount = coverageAmounts[coverage.id] || coverage.defaultAmount;
+                        const currentAmount = coverageAmounts[coverage.id] || coverage.defaultAmount;
                        const price = calculatePrice(coverage, ageValue, currentAmount);
                        
                        return (
@@ -454,19 +454,20 @@ const Seguros = () => {
                                 <Label htmlFor={`amount-${coverage.id}`} className="text-xs">
                                   {coverage.id.includes("diaria") ? "Valor da Diária (R$)" : "Valor da Cobertura (R$)"}
                                 </Label>
-                                <Input
-                                  id={`amount-${coverage.id}`}
-                                  type="number"
-                                  value={currentAmount}
-                                  onChange={(e) => setCoverageAmounts(prev => ({
-                                    ...prev,
-                                    [coverage.id]: parseInt(e.target.value) || coverage.defaultAmount
-                                  }))}
-                                  min={coverage.minAmount}
-                                  max={coverage.maxAmount}
-                                  step={coverage.id.includes("diaria") ? "25" : "1000"}
-                                  className="mt-1"
-                               />
+                                 <Input
+                                   id={`amount-${coverage.id}`}
+                                   type="number"
+                                   value={coverageAmounts[coverage.id] || ""}
+                                   onChange={(e) => setCoverageAmounts(prev => ({
+                                     ...prev,
+                                     [coverage.id]: parseInt(e.target.value) || 0
+                                   }))}
+                                   placeholder={`Ex: ${coverage.defaultAmount.toLocaleString('pt-BR')}`}
+                                   min={coverage.minAmount}
+                                   max={coverage.maxAmount}
+                                   step={coverage.id.includes("diaria") ? "25" : "1000"}
+                                   className="mt-1"
+                                 />
                                <p className="text-xs text-muted-foreground mt-1">
                                  Min: R$ {coverage.minAmount.toLocaleString('pt-BR')} | 
                                  Max: R$ {coverage.maxAmount.toLocaleString('pt-BR')}
