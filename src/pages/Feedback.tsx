@@ -32,8 +32,8 @@ const Feedback = () => {
     setIsSubmitting(true);
 
     try {
-      // Enviar email através da Edge Function do Supabase
-      const response = await fetch('/api/v1/functions/send-feedback-email', {
+      // Enviar email através do arquivo PHP
+      const response = await fetch('/enviar-feedback.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
