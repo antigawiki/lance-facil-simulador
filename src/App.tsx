@@ -11,6 +11,7 @@ import Seguros from "./pages/Seguros";
 import Capitalizacao from "./pages/Capitalizacao";
 import SimuladorInvestimentos from "./pages/SimuladorInvestimentos";
 import Feedback from "./pages/Feedback";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/capitalizacao" element={<Capitalizacao />} />
           <Route path="/simulador-investimentos" element={<SimuladorInvestimentos />} />
           <Route path="/feedback" element={<Feedback />} />
+          <Route path="/admin" element={<Admin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

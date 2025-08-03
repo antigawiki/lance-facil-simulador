@@ -6,11 +6,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Send } from "lucide-react";
 import itauLogo from "@/assets/itau-logo.png";
 
 const Feedback = () => {
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -20,7 +22,7 @@ const Feedback = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name || !subject || !message) {
+    if (!name || !email || !subject || !message) {
       toast({
         title: "Campos obrigatórios",
         description: "Por favor, preencha todos os campos.",
@@ -32,22 +34,18 @@ const Feedback = () => {
     setIsSubmitting(true);
 
     try {
-      // Enviar email através do arquivo PHP
-      const response = await fetch('/enviar-feedback.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name,
-          subject,
-          message
-        })
-      });
+      const { error } = await supabase
+        .from('messages')
+        .insert([
+          {
+            name,
+            email,
+            subject,
+            message,
+          },
+        ]);
 
-      if (!response.ok) {
-        throw new Error('Falha ao enviar email');
-      }
+      if (error) throw error;
       
       toast({
         title: "Mensagem enviada com sucesso!",
@@ -57,6 +55,7 @@ const Feedback = () => {
 
       // Limpar formulário
       setName("");
+      setEmail("");
       setSubject("");
       setMessage("");
 
@@ -115,6 +114,18 @@ const Feedback = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Seu nome completo"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email *</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="seu@email.com"
                   required
                 />
               </div>
