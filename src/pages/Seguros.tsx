@@ -24,102 +24,193 @@ interface Coverage {
   maxAmount: number;
 }
 
+// Tabela de preços por idade baseada na planilha
+const getPriceByAge = (coverageId: string, age: number): number => {
+  const priceTable: { [key: string]: { [ageRange: string]: number } } = {
+    "morte-qualquer-causa": {
+      "18-25": 2.50, "26-30": 3.80, "31-35": 5.20, "36-40": 7.80, "41-45": 12.50,
+      "46-50": 18.90, "51-55": 28.70, "56-60": 43.20, "61-65": 65.80, "66-70": 98.50
+    },
+    "morte-acidental": {
+      "18-25": 1.20, "26-30": 1.50, "31-35": 1.80, "36-40": 2.30, "41-45": 2.90,
+      "46-50": 3.80, "51-55": 4.90, "56-60": 6.20, "61-65": 7.80, "66-70": 9.80
+    },
+    "invalidez-acidente": {
+      "18-25": 1.80, "26-30": 2.20, "31-35": 2.70, "36-40": 3.40, "41-45": 4.30,
+      "46-50": 5.60, "51-55": 7.20, "56-60": 9.10, "61-65": 11.50, "66-70": 14.20
+    },
+    "doencas-graves": {
+      "18-25": 3.50, "26-30": 5.20, "31-35": 7.80, "36-40": 11.80, "41-45": 17.90,
+      "46-50": 26.80, "51-55": 40.20, "56-60": 60.30, "61-65": 90.50, "66-70": 135.80
+    },
+    "diaria-acidente": {
+      "18-25": 0.28, "26-30": 0.35, "31-35": 0.42, "36-40": 0.53, "41-45": 0.67,
+      "46-50": 0.85, "51-55": 1.08, "56-60": 1.35, "61-65": 1.70, "66-70": 2.15
+    },
+    "diaria-doenca": {
+      "18-25": 0.45, "26-30": 0.58, "31-35": 0.75, "36-40": 0.97, "41-45": 1.26,
+      "46-50": 1.64, "51-55": 2.13, "56-60": 2.77, "61-65": 3.60, "66-70": 4.68
+    },
+    "quebra-ossos": {
+      "18-25": 0.32, "26-30": 0.38, "31-35": 0.45, "36-40": 0.54, "41-45": 0.65,
+      "46-50": 0.78, "51-55": 0.94, "56-60": 1.13, "61-65": 1.36, "66-70": 1.63
+    },
+    "doencas-graves-plus": {
+      "18-25": 4.20, "26-30": 6.30, "31-35": 9.50, "36-40": 14.30, "41-45": 21.50,
+      "46-50": 32.30, "51-55": 48.50, "56-60": 72.80, "61-65": 109.20, "66-70": 163.80
+    },
+    "diagnostico-cancer": {
+      "18-25": 2.80, "26-30": 4.20, "31-35": 6.30, "36-40": 9.50, "41-45": 14.30,
+      "46-50": 21.50, "51-55": 32.30, "56-60": 48.50, "61-65": 72.80, "66-70": 109.20
+    },
+    "auxilio-funeral": {
+      "18-25": 4.50, "26-30": 4.50, "31-35": 4.50, "36-40": 4.50, "41-45": 4.50,
+      "46-50": 4.50, "51-55": 4.50, "56-60": 4.50, "61-65": 4.50, "66-70": 4.50
+    },
+    "auxilio-funeral-conjuge": {
+      "18-25": 3.20, "26-30": 3.20, "31-35": 3.20, "36-40": 3.20, "41-45": 3.20,
+      "46-50": 3.20, "51-55": 3.20, "56-60": 3.20, "61-65": 3.20, "66-70": 3.20
+    },
+    "auxilio-funeral-pais": {
+      "18-25": 8.90, "26-30": 8.90, "31-35": 8.90, "36-40": 8.90, "41-45": 8.90,
+      "46-50": 8.90, "51-55": 8.90, "56-60": 8.90, "61-65": 8.90, "66-70": 8.90
+    }
+  };
+
+  const getAgeRange = (age: number): string => {
+    if (age >= 18 && age <= 25) return "18-25";
+    if (age >= 26 && age <= 30) return "26-30";
+    if (age >= 31 && age <= 35) return "31-35";
+    if (age >= 36 && age <= 40) return "36-40";
+    if (age >= 41 && age <= 45) return "41-45";
+    if (age >= 46 && age <= 50) return "46-50";
+    if (age >= 51 && age <= 55) return "51-55";
+    if (age >= 56 && age <= 60) return "56-60";
+    if (age >= 61 && age <= 65) return "61-65";
+    if (age >= 66 && age <= 70) return "66-70";
+    return "66-70"; // fallback para idades acima de 70
+  };
+
+  const ageRange = getAgeRange(age);
+  return priceTable[coverageId]?.[ageRange] || 0;
+};
+
 const coverages: Coverage[] = [
+  {
+    id: "morte-qualquer-causa",
+    name: "Morte Qualquer Causa",
+    description: "Garante ao beneficiário o pagamento no caso de morte por qualquer causa.",
+    basePrice: 0, // Será calculado pela tabela
+    icon: Shield,
+    defaultAmount: 50000,
+    minAmount: 10000,
+    maxAmount: 500000
+  },
   {
     id: "morte-acidental",
     name: "Morte Acidental",
     description: "Garante ao beneficiário o pagamento no caso de morte por acidente.",
-    basePrice: 0.12, // R$ 0.12 per R$ 1,000 - ajustado conforme pesquisa de mercado
+    basePrice: 0,
     icon: AlertTriangle,
     defaultAmount: 50000,
-    minAmount: 5000,
-    maxAmount: 300000
+    minAmount: 10000,
+    maxAmount: 500000
   },
   {
     id: "invalidez-acidente",
-    name: "Invalidez Permanente por Acidente", 
-    description: "Garante pagamento no caso de invalidez funcional definitiva causada por acidente pessoal.",
-    basePrice: 0.18,
+    name: "Invalidez por Acidente",
+    description: "Garante pagamento no caso de invalidez permanente causada por acidente.",
+    basePrice: 0,
     icon: AlertTriangle,
-    defaultAmount: 30000,
-    minAmount: 5000,
-    maxAmount: 150000
-  },
-  {
-    id: "morte-qualquer-causa",
-    name: "Morte por Qualquer Causa",
-    description: "Garante ao beneficiário o pagamento no caso de morte por doença, velhice ou acidente.",
-    basePrice: 0.35, // R$ 0.35 per R$ 1,000 - ajustado conforme pesquisa
-    icon: Shield,
     defaultAmount: 50000,
-    minAmount: 5000,
-    maxAmount: 300000
-  },
-  {
-    id: "diaria-acidente",
-    name: "Diária de Internação por Acidente",
-    description: "Pagamento de diária durante internação hospitalar decorrente de acidente.",
-    basePrice: 0.25, // R$ 0.25 por R$ 1 de diária - muito mais baixo conforme mercado
-    icon: Home,
-    defaultAmount: 100, // R$ 100/dia
-    minAmount: 25,
-    maxAmount: 300
-  },
-  {
-    id: "diaria-doenca",
-    name: "Diária de Internação por Doença",
-    description: "Pagamento de diária durante internação hospitalar decorrente de doença.",
-    basePrice: 0.35, // R$ 0.35 por R$ 1 de diária - ajustado para baixo
-    icon: Home,
-    defaultAmount: 100, // R$ 100/dia
-    minAmount: 25,
-    maxAmount: 300
-  },
-  {
-    id: "quebra-ossos",
-    name: "Quebra de Ossos",
-    description: "Indenização em caso de fratura óssea decorrente de acidente pessoal.",
-    basePrice: 0.28,
-    icon: Heart,
-    defaultAmount: 2000,
-    minAmount: 500,
-    maxAmount: 5000
+    minAmount: 10000,
+    maxAmount: 500000
   },
   {
     id: "doencas-graves",
     name: "Doenças Graves",
-    description: "Indenização em caso de primeiro diagnóstico de câncer, infarto, AVC, insuficiência renal ou transplante de órgãos.",
-    basePrice: 0.65,
+    description: "Cobertura para doenças graves como câncer, infarto, AVC e outras.",
+    basePrice: 0,
     icon: Heart,
     defaultAmount: 30000,
-    minAmount: 5000,
-    maxAmount: 150000
+    minAmount: 10000,
+    maxAmount: 300000
   },
   {
-    id: "funeral-segurado",
-    name: "Auxílio Funeral do Segurado",
+    id: "diaria-acidente",
+    name: "Diária de Internação Hospitalar (Acidente)",
+    description: "Pagamento de diária durante internação hospitalar por acidente.",
+    basePrice: 0,
+    icon: Home,
+    defaultAmount: 100,
+    minAmount: 50,
+    maxAmount: 500
+  },
+  {
+    id: "diaria-doenca",
+    name: "Diária de Internação Hospitalar (Acidente ou Doença)",
+    description: "Pagamento de diária durante internação hospitalar por acidente ou doença.",
+    basePrice: 0,
+    icon: Home,
+    defaultAmount: 100,
+    minAmount: 50,
+    maxAmount: 500
+  },
+  {
+    id: "quebra-ossos",
+    name: "Quebra de Ossos",
+    description: "Indenização em caso de fratura óssea decorrente de acidente.",
+    basePrice: 0,
+    icon: Heart,
+    defaultAmount: 2000,
+    minAmount: 1000,
+    maxAmount: 10000
+  },
+  {
+    id: "doencas-graves-plus",
+    name: "Doenças Graves Plus",
+    description: "Cobertura ampliada para doenças graves com mais benefícios.",
+    basePrice: 0,
+    icon: Heart,
+    defaultAmount: 50000,
+    minAmount: 10000,
+    maxAmount: 300000
+  },
+  {
+    id: "diagnostico-cancer",
+    name: "Diagnóstico de Câncer",
+    description: "Cobertura específica para primeiro diagnóstico de câncer.",
+    basePrice: 0,
+    icon: Heart,
+    defaultAmount: 30000,
+    minAmount: 10000,
+    maxAmount: 200000
+  },
+  {
+    id: "auxilio-funeral",
+    name: "Auxílio Funeral",
     description: "Auxílio para despesas de funeral do segurado - Valor fixo de R$ 5.000.",
-    basePrice: 4.50, // Valor fixo mensal - ajustado para baixo
+    basePrice: 0,
     icon: Shield,
     defaultAmount: 5000,
     minAmount: 5000,
     maxAmount: 5000
   },
   {
-    id: "funeral-conjuge-filhos",
-    name: "Auxílio Funeral Cônjuge e Filhos",
+    id: "auxilio-funeral-conjuge",
+    name: "Auxílio Funeral (Cônjuge e Filhos)",
     description: "Auxílio para despesas de funeral do cônjuge e filhos - Valor fixo de R$ 5.000.",
-    basePrice: 3.20, // Valor fixo mensal - ajustado para baixo
+    basePrice: 0,
     icon: Shield,
     defaultAmount: 5000,
     minAmount: 5000,
     maxAmount: 5000
   },
   {
-    id: "funeral-pais",
-    name: "Auxílio Funeral dos Pais",
+    id: "auxilio-funeral-pais",
+    name: "Auxílio Funeral (Pais)",
     description: "Auxílio para despesas de funeral dos pais do segurado - Valor fixo de R$ 5.000.",
-    basePrice: 8.90, // Valor fixo mensal - o mais caro conforme solicitado
+    basePrice: 0,
     icon: Shield,
     defaultAmount: 5000,
     minAmount: 5000,
@@ -139,28 +230,21 @@ const Seguros = () => {
   const [showSimulation, setShowSimulation] = useState(false);
 
   const calculatePrice = (coverage: Coverage, ageValue: number, coverageAmount: number) => {
-    // Para coberturas de valor fixo (auxílios funeral)
-    if (coverage.id.includes("funeral")) {
-      return coverage.basePrice;
+    // Usar tabela de preços baseada na planilha
+    const basePrice = getPriceByAge(coverage.id, ageValue);
+    
+    // Para auxílios funeral (valor fixo)
+    if (coverage.id.includes("auxilio-funeral")) {
+      return basePrice;
     }
-
-    // Fator de idade baseado em pesquisa de mercado brasileiro
-    let ageFactor = 1;
-    if (ageValue >= 18 && ageValue <= 25) ageFactor = 0.6;
-    else if (ageValue >= 26 && ageValue <= 35) ageFactor = 0.8;
-    else if (ageValue >= 36 && ageValue <= 45) ageFactor = 1.2;
-    else if (ageValue >= 46 && ageValue <= 55) ageFactor = 1.8;
-    else if (ageValue >= 56 && ageValue <= 65) ageFactor = 2.8;
-    else if (ageValue > 65) ageFactor = 4.2;
 
     // Para diárias, calcular por valor da diária
     if (coverage.id.includes("diaria")) {
-      return coverage.basePrice * ageFactor * coverageAmount;
+      return basePrice * coverageAmount;
     }
 
-    // Calcular preço por mil de cobertura para outros tipos
-    const pricePerThousand = coverage.basePrice * ageFactor;
-    return (pricePerThousand * coverageAmount) / 1000;
+    // Para outras coberturas, calcular por R$ 1.000 de cobertura
+    return (basePrice * coverageAmount) / 1000;
   };
 
   const handleCoverageToggle = (coverageId: string) => {
@@ -449,7 +533,7 @@ const Seguros = () => {
                                </p>
                              </div>
                            </div>
-                            {!coverage.id.includes("funeral") && (
+                            {!coverage.id.includes("auxilio-funeral") && (
                               <div className="ml-7">
                                 <Label htmlFor={`amount-${coverage.id}`} className="text-xs">
                                   {coverage.id.includes("diaria") ? "Valor da Diária (R$)" : "Valor da Cobertura (R$)"}
