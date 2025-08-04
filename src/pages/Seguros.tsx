@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Download, Shield, Heart, AlertTriangle, Car, Phone, Home } from "lucide-react";
@@ -224,7 +225,7 @@ const Seguros = () => {
   const printRef = useRef<HTMLDivElement>(null);
   
   const [age, setAge] = useState("");
-  const [months, setMonths] = useState("");
+  const [segment, setSegment] = useState("");
   const [selectedCoverages, setSelectedCoverages] = useState<string[]>([]);
   const [coverageAmounts, setCoverageAmounts] = useState<{[key: string]: number}>({});
   const [showSimulation, setShowSimulation] = useState(false);
@@ -265,10 +266,10 @@ const Seguros = () => {
       return;
     }
 
-    if (months && (parseInt(months) < 0 || parseInt(months) > 11)) {
+    if (!segment) {
       toast({
-        title: "Meses inválidos",
-        description: "Os meses devem estar entre 0 e 11.",
+        title: "Segmento obrigatório",
+        description: "Selecione um segmento para continuar.",
         variant: "destructive",
       });
       return;
@@ -316,7 +317,8 @@ const Seguros = () => {
         <div>
           <h2 style="color: #ff6600; font-size: 20px; margin: 0 0 15px 0; border-bottom: 2px solid #ff6600; padding-bottom: 5px;">Dados do Cliente</h2>
           <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
-            <p style="margin: 8px 0; color: #333;"><strong>Idade:</strong> ${age} anos e ${months} meses</p>
+            <p style="margin: 8px 0; color: #333;"><strong>Idade:</strong> ${age} anos</p>
+            <p style="margin: 8px 0; color: #333;"><strong>Segmento:</strong> ${segment}</p>
             <p style="margin: 8px 0; color: #333;"><strong>Quantidade de Coberturas:</strong> ${selectedCoverages.length}</p>
           </div>
         </div>
@@ -487,16 +489,18 @@ const Seguros = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="months">Meses</Label>
-                    <Input
-                      id="months"
-                      type="number"
-                      value={months}
-                      onChange={(e) => setMonths(e.target.value)}
-                      placeholder="Ex: 6"
-                      min="0"
-                      max="11"
-                    />
+                    <Label htmlFor="segment">Segmento</Label>
+                    <Select value={segment} onValueChange={setSegment}>
+                      <SelectTrigger id="segment">
+                        <SelectValue placeholder="Selecione o segmento" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="itau-agencias">Itaú Agências</SelectItem>
+                        <SelectItem value="uniclass">Uniclass</SelectItem>
+                        <SelectItem value="personnalite">Personnalité</SelectItem>
+                        <SelectItem value="empreenda">Empreenda</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
@@ -581,7 +585,7 @@ const Seguros = () => {
                       <img src={itauLogo} alt="Itaú" className="h-12" />
                       <div>
                         <CardTitle className="text-2xl text-primary">Simulação Seguro Itaú Vida</CardTitle>
-                        <p className="text-muted-foreground">Idade: {age} anos e {months} meses</p>
+                        <p className="text-muted-foreground">Idade: {age} anos - Segmento: {segment}</p>
                       </div>
                     </div>
                   </CardHeader>
