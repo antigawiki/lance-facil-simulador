@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Calculator, TrendingUp, TrendingDown, DollarSign, Download, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
@@ -19,6 +20,7 @@ interface ConsortiumData {
   reserveFundFee: number;
   insuranceValue: number;
   installmentValue: number;
+  isContracted: boolean;
 }
 
 interface BidData {
@@ -63,6 +65,7 @@ const ConsortiumSimulator = () => {
     reserveFundFee: 0,
     insuranceValue: 0,
     installmentValue: 0,
+    isContracted: false,
   });
 
   const [bid, setBid] = useState<BidData>({
@@ -339,6 +342,19 @@ const ConsortiumSimulator = () => {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="flex items-center space-x-3 p-4 bg-muted/30 rounded-md">
+                <Checkbox
+                  id="isContracted"
+                  checked={consortium.isContracted}
+                  onCheckedChange={(checked) => 
+                    setConsortium({ ...consortium, isContracted: Boolean(checked) })
+                  }
+                />
+                <Label htmlFor="isContracted" className="text-sm font-medium cursor-pointer">
+                  Consórcio já contratado
+                </Label>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
