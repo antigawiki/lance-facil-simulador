@@ -312,16 +312,6 @@ const ConsortiumSimulator = () => {
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center justify-between mb-8">
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/")}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Voltar
-          </Button>
-        </div>
 
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-4 mb-4">
