@@ -127,7 +127,14 @@ const ConsortiumSimulator = () => {
 
     // Opção 2: Reduzir prazo (mesma parcela)
     const installmentWithoutInsurance = consortium.installmentValue - consortium.insuranceValue;
-    const newTerm = Math.ceil(remainingDebt / installmentWithoutInsurance);
+    let newTerm = Math.ceil(remainingDebt / installmentWithoutInsurance);
+    let finalInstallmentValue = consortium.installmentValue;
+    
+    // Se o novo prazo for maior que o prazo restante, ajustar
+    if (newTerm > remainingTerm) {
+      newTerm = remainingTerm;
+      finalInstallmentValue = (remainingDebt / remainingTerm) + consortium.insuranceValue;
+    }
 
     setResult({
       totalBidValue,
@@ -139,7 +146,7 @@ const ConsortiumSimulator = () => {
       },
       optionReduceTerm: {
         newTerm,
-        sameInstallmentValue: consortium.installmentValue,
+        sameInstallmentValue: finalInstallmentValue,
       },
     });
   };
