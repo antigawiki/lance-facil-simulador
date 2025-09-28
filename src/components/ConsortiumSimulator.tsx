@@ -21,6 +21,7 @@ interface ConsortiumData {
   insuranceValue: number;
   installmentValue: number;
   isContracted: boolean;
+  paidInstallments: number;
 }
 
 interface BidData {
@@ -66,6 +67,7 @@ const ConsortiumSimulator = () => {
     insuranceValue: 0,
     installmentValue: 0,
     isContracted: false,
+    paidInstallments: 0,
   });
 
   const [bid, setBid] = useState<BidData>({
@@ -109,10 +111,19 @@ const ConsortiumSimulator = () => {
     const debtBalance = consortium.cardValue * (1 + consortium.adminFee/100 + consortium.reserveFundFee/100);
     
     // Saldo devedor após o lance
-    const remainingDebt = debtBalance - totalBidValue;
+    let remainingDebt = debtBalance - totalBidValue;
+    
+    // Se já contratado, considerar parcelas pagas
+    let remainingTerm = consortium.term;
+    if (consortium.isContracted && consortium.paidInstallments > 0) {
+      const installmentWithoutInsurance = consortium.installmentValue - consortium.insuranceValue;
+      const paidAmount = consortium.paidInstallments * installmentWithoutInsurance;
+      remainingDebt = remainingDebt - paidAmount;
+      remainingTerm = consortium.term - consortium.paidInstallments;
+    }
 
     // Opção 1: Reduzir valor da parcela (mesmo prazo)
-    const newInstallmentValue = (remainingDebt / consortium.term) + consortium.insuranceValue;
+    const newInstallmentValue = (remainingDebt / remainingTerm) + consortium.insuranceValue;
 
     // Opção 2: Reduzir prazo (mesma parcela)
     const installmentWithoutInsurance = consortium.installmentValue - consortium.insuranceValue;
@@ -124,7 +135,7 @@ const ConsortiumSimulator = () => {
       remainingCardValue,
       optionReduceInstallment: {
         newInstallmentValue,
-        sameTerm: consortium.term,
+        sameTerm: remainingTerm,
       },
       optionReduceTerm: {
         newTerm,
@@ -356,6 +367,21 @@ const ConsortiumSimulator = () => {
                   Consórcio já contratado
                 </Label>
               </div>
+
+              {consortium.isContracted && (
+                <div className="space-y-2">
+                  <Label htmlFor="paidInstallments">Quantidade de Parcelas Pagas</Label>
+                  <Input
+                    id="paidInstallments"
+                    type="number"
+                    placeholder="0"
+                    min="0"
+                    max={consortium.term}
+                    value={consortium.paidInstallments || ""}
+                    onChange={(e) => setConsortium({ ...consortium, paidInstallments: Number(e.target.value) })}
+                  />
+                </div>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
