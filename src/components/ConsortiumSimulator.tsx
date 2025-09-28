@@ -66,7 +66,7 @@ const ConsortiumSimulator = () => {
     reserveFundFee: 0,
     insuranceValue: 0,
     installmentValue: 0,
-    isContracted: false,
+    isContracted: true,
     paidInstallments: 0,
   });
 
@@ -352,33 +352,18 @@ const ConsortiumSimulator = () => {
                 </Select>
               </div>
 
-              <div className="flex items-center space-x-3 p-4 bg-muted/30 rounded-md">
-                <Checkbox
-                  id="isContracted"
-                  checked={consortium.isContracted}
-                  onCheckedChange={(checked) => 
-                    setConsortium({ ...consortium, isContracted: Boolean(checked) })
-                  }
+              <div className="space-y-2">
+                <Label htmlFor="paidInstallments">Quantidade de Parcelas Pagas</Label>
+                <Input
+                  id="paidInstallments"
+                  type="number"
+                  placeholder="0"
+                  min="0"
+                  max={consortium.term}
+                  value={consortium.paidInstallments || ""}
+                  onChange={(e) => setConsortium({ ...consortium, paidInstallments: Number(e.target.value) })}
                 />
-                <Label htmlFor="isContracted" className="text-sm font-medium cursor-pointer">
-                  Consórcio já contratado
-                </Label>
               </div>
-
-              {consortium.isContracted && (
-                <div className="space-y-2">
-                  <Label htmlFor="paidInstallments">Quantidade de Parcelas Pagas</Label>
-                  <Input
-                    id="paidInstallments"
-                    type="number"
-                    placeholder="0"
-                    min="0"
-                    max={consortium.term}
-                    value={consortium.paidInstallments || ""}
-                    onChange={(e) => setConsortium({ ...consortium, paidInstallments: Number(e.target.value) })}
-                  />
-                </div>
-              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
