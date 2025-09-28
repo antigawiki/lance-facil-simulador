@@ -367,7 +367,7 @@ const ConsortiumSimulator = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="cardValue">Valor da Carta (R$)</Label>
+                  <Label htmlFor="cardValue">Valor da Carta</Label>
                   <Input
                     id="cardValue"
                     type="number"
@@ -375,6 +375,11 @@ const ConsortiumSimulator = () => {
                     value={consortium.cardValue || ""}
                     onChange={(e) => setConsortium({ ...consortium, cardValue: Number(e.target.value) })}
                   />
+                  {consortium.cardValue > 0 && (
+                    <p className="text-sm text-muted-foreground">
+                      {formatCurrency(consortium.cardValue)}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
