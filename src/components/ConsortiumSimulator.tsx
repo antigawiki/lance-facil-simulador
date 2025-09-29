@@ -70,6 +70,30 @@ const parseCurrencyInput = (value: string) => {
   return numericValue ? parseInt(numericValue) / 100 : 0;
 };
 
+const formatDecimalInput = (value: string) => {
+  const numericValue = value.replace(/[^\d,]/g, '');
+  if (!numericValue) return '';
+  
+  // Remove múltiplas vírgulas e mantém apenas a primeira
+  const parts = numericValue.split(',');
+  if (parts.length > 2) {
+    return parts[0] + ',' + parts[1];
+  }
+  
+  // Limita as casas decimais a 2
+  if (parts[1] && parts[1].length > 2) {
+    return parts[0] + ',' + parts[1].substring(0, 2);
+  }
+  
+  return numericValue;
+};
+
+const parseDecimalInput = (value: string) => {
+  const cleanValue = value.replace(',', '.');
+  const numeric = parseFloat(cleanValue);
+  return isNaN(numeric) ? 0 : numeric;
+};
+
 const ConsortiumSimulator = () => {
   const navigate = useNavigate();
   
@@ -95,6 +119,10 @@ const ConsortiumSimulator = () => {
   const [cardValueDisplay, setCardValueDisplay] = useState("");
   const [ownResourcesDisplay, setOwnResourcesDisplay] = useState("");
   const [installmentValueDisplay, setInstallmentValueDisplay] = useState("");
+  const [insuranceValueDisplay, setInsuranceValueDisplay] = useState("");
+  const [ownCardValueDisplay, setOwnCardValueDisplay] = useState("");
+  const [adminFeeDisplay, setAdminFeeDisplay] = useState("");
+  const [reserveFundFeeDisplay, setReserveFundFeeDisplay] = useState("");
 
   const [result, setResult] = useState<CalculationResult | null>(null);
 
@@ -417,11 +445,15 @@ const ConsortiumSimulator = () => {
                   <Label htmlFor="adminFee">Taxa de Administração (%)</Label>
                   <Input
                     id="adminFee"
-                    type="number"
-                    step="0.01"
-                    placeholder="15.50"
-                    value={consortium.adminFee || ""}
-                    onChange={(e) => setConsortium({ ...consortium, adminFee: Number(e.target.value) })}
+                    type="text"
+                    placeholder="15,50"
+                    value={adminFeeDisplay}
+                    onChange={(e) => {
+                      const formatted = formatDecimalInput(e.target.value);
+                      const numeric = parseDecimalInput(e.target.value);
+                      setAdminFeeDisplay(formatted);
+                      setConsortium({ ...consortium, adminFee: numeric });
+                    }}
                   />
                 </div>
 
@@ -429,22 +461,31 @@ const ConsortiumSimulator = () => {
                   <Label htmlFor="reserveFundFee">Taxa do Fundo Reserva (%)</Label>
                   <Input
                     id="reserveFundFee"
-                    type="number"
-                    step="0.01"
-                    placeholder="2.50"
-                    value={consortium.reserveFundFee || ""}
-                    onChange={(e) => setConsortium({ ...consortium, reserveFundFee: Number(e.target.value) })}
+                    type="text"
+                    placeholder="2,50"
+                    value={reserveFundFeeDisplay}
+                    onChange={(e) => {
+                      const formatted = formatDecimalInput(e.target.value);
+                      const numeric = parseDecimalInput(e.target.value);
+                      setReserveFundFeeDisplay(formatted);
+                      setConsortium({ ...consortium, reserveFundFee: numeric });
+                    }}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="insuranceValue">Valor do Seguro (R$)</Label>
+                  <Label htmlFor="insuranceValue">Valor do Seguro</Label>
                   <Input
                     id="insuranceValue"
-                    type="number"
-                    placeholder="0"
-                    value={consortium.insuranceValue || ""}
-                    onChange={(e) => setConsortium({ ...consortium, insuranceValue: Number(e.target.value) })}
+                    type="text"
+                    placeholder="R$ 0,00"
+                    value={insuranceValueDisplay}
+                    onChange={(e) => {
+                      const formatted = formatCurrencyInput(e.target.value);
+                      const numeric = parseCurrencyInput(e.target.value);
+                      setInsuranceValueDisplay(formatted);
+                      setConsortium({ ...consortium, insuranceValue: numeric });
+                    }}
                   />
                 </div>
 
@@ -490,12 +531,21 @@ const ConsortiumSimulator = () => {
                       </SelectContent>
                     </Select>
                     <Input
-                      type="number"
-                      step={bid.ownCardType === "percentage" ? "0.01" : "1"}
-                      max={bid.ownCardType === "percentage" ? "30" : consortium.cardValue * 0.3}
-                      placeholder={bid.ownCardType === "percentage" ? "20" : "20000"}
-                      value={bid.ownCardValue || ""}
-                      onChange={(e) => setBid({ ...bid, ownCardValue: Number(e.target.value) })}
+                      type="text"
+                      placeholder={bid.ownCardType === "percentage" ? "20,00" : "R$ 20.000,00"}
+                      value={bid.ownCardType === "percentage" ? (bid.ownCardValue ? bid.ownCardValue.toString().replace('.', ',') : "") : ownCardValueDisplay}
+                      onChange={(e) => {
+                        if (bid.ownCardType === "percentage") {
+                          const formatted = formatDecimalInput(e.target.value);
+                          const numeric = parseDecimalInput(e.target.value);
+                          setBid({ ...bid, ownCardValue: numeric });
+                        } else {
+                          const formatted = formatCurrencyInput(e.target.value);
+                          const numeric = parseCurrencyInput(e.target.value);
+                          setOwnCardValueDisplay(formatted);
+                          setBid({ ...bid, ownCardValue: numeric });
+                        }
+                      }}
                     />
                   </div>
                   {bid.ownCardType === "percentage" && bid.ownCardValue > 30 && (
