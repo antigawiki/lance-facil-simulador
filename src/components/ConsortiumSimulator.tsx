@@ -641,7 +641,10 @@ const ConsortiumSimulator = () => {
                     </div>
                     <div className="p-3 bg-primary/5 rounded-md">
                       <p className="text-sm text-muted-foreground">
-                        Redução de {formatCurrency(consortium.installmentValue - result.optionReduceInstallment.newInstallmentValue)} por mês
+                        {consortium.installmentValue > result.optionReduceInstallment.newInstallmentValue 
+                          ? `Redução de ${formatCurrency(consortium.installmentValue - result.optionReduceInstallment.newInstallmentValue)} por mês`
+                          : `Aumento de ${formatCurrency(result.optionReduceInstallment.newInstallmentValue - consortium.installmentValue)} por mês`
+                        }
                       </p>
                     </div>
                   </CardContent>
