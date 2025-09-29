@@ -55,6 +55,21 @@ const formatPercentage = (value: number) => {
   return `${value.toFixed(2)}%`;
 };
 
+const formatCurrencyInput = (value: string) => {
+  const numericValue = value.replace(/\D/g, '');
+  if (!numericValue) return '';
+  const number = parseInt(numericValue) / 100;
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(number);
+};
+
+const parseCurrencyInput = (value: string) => {
+  const numericValue = value.replace(/\D/g, '');
+  return numericValue ? parseInt(numericValue) / 100 : 0;
+};
+
 const ConsortiumSimulator = () => {
   const navigate = useNavigate();
   
@@ -75,6 +90,10 @@ const ConsortiumSimulator = () => {
     ownCardValue: 0,
     ownResourcesValue: 0,
   });
+
+  // Estados para valores formatados
+  const [cardValueDisplay, setCardValueDisplay] = useState("");
+  const [ownResourcesDisplay, setOwnResourcesDisplay] = useState("");
 
   const [result, setResult] = useState<CalculationResult | null>(null);
 
@@ -370,16 +389,16 @@ const ConsortiumSimulator = () => {
                   <Label htmlFor="cardValue">Valor da Carta</Label>
                   <Input
                     id="cardValue"
-                    type="number"
-                    placeholder="100000"
-                    value={consortium.cardValue || ""}
-                    onChange={(e) => setConsortium({ ...consortium, cardValue: Number(e.target.value) })}
+                    type="text"
+                    placeholder="R$ 100.000,00"
+                    value={cardValueDisplay}
+                    onChange={(e) => {
+                      const formatted = formatCurrencyInput(e.target.value);
+                      const numeric = parseCurrencyInput(e.target.value);
+                      setCardValueDisplay(formatted);
+                      setConsortium({ ...consortium, cardValue: numeric });
+                    }}
                   />
-                  {consortium.cardValue > 0 && (
-                    <p className="text-sm text-muted-foreground">
-                      {formatCurrency(consortium.cardValue)}
-                    </p>
-                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -482,11 +501,15 @@ const ConsortiumSimulator = () => {
                   <Label htmlFor="ownResourcesValue">Recursos Próprios (máx. 95% da carta)</Label>
                   <Input
                     id="ownResourcesValue"
-                    type="number"
-                    placeholder="30000"
-                    max={consortium.cardValue * 0.95}
-                    value={bid.ownResourcesValue || ""}
-                    onChange={(e) => setBid({ ...bid, ownResourcesValue: Number(e.target.value) })}
+                    type="text"
+                    placeholder="R$ 30.000,00"
+                    value={ownResourcesDisplay}
+                    onChange={(e) => {
+                      const formatted = formatCurrencyInput(e.target.value);
+                      const numeric = parseCurrencyInput(e.target.value);
+                      setOwnResourcesDisplay(formatted);
+                      setBid({ ...bid, ownResourcesValue: numeric });
+                    }}
                   />
                   {bid.ownResourcesValue > consortium.cardValue * 0.95 && (
                     <p className="text-destructive text-sm">Máximo permitido: {formatCurrency(consortium.cardValue * 0.95)}</p>
