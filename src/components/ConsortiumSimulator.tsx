@@ -94,6 +94,7 @@ const ConsortiumSimulator = () => {
   // Estados para valores formatados
   const [cardValueDisplay, setCardValueDisplay] = useState("");
   const [ownResourcesDisplay, setOwnResourcesDisplay] = useState("");
+  const [installmentValueDisplay, setInstallmentValueDisplay] = useState("");
 
   const [result, setResult] = useState<CalculationResult | null>(null);
 
@@ -448,13 +449,18 @@ const ConsortiumSimulator = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="installmentValue">Valor da Prestação (R$)</Label>
+                  <Label htmlFor="installmentValue">Valor da Prestação</Label>
                   <Input
                     id="installmentValue"
-                    type="number"
-                    placeholder="2000"
-                    value={consortium.installmentValue || ""}
-                    onChange={(e) => setConsortium({ ...consortium, installmentValue: Number(e.target.value) })}
+                    type="text"
+                    placeholder="R$ 2.000,00"
+                    value={installmentValueDisplay}
+                    onChange={(e) => {
+                      const formatted = formatCurrencyInput(e.target.value);
+                      const numeric = parseCurrencyInput(e.target.value);
+                      setInstallmentValueDisplay(formatted);
+                      setConsortium({ ...consortium, installmentValue: numeric });
+                    }}
                   />
                 </div>
               </div>
