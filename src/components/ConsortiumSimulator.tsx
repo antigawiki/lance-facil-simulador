@@ -325,7 +325,7 @@ const ConsortiumSimulator = () => {
         height: pdfElement.scrollHeight
       });
 
-      const imgData = canvas.toDataURL('image/png');
+      const imgData = canvas.toDataURL('image/jpeg', 0.85);
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
@@ -344,11 +344,11 @@ const ConsortiumSimulator = () => {
         
         // Centraliza horizontalmente se necessário
         const xOffset = (210 - scaledWidth) / 2;
-        pdf.addImage(imgData, 'PNG', xOffset, 0, scaledWidth, scaledHeight);
+        pdf.addImage(imgData, 'JPEG', xOffset, 0, scaledWidth, scaledHeight);
       } else {
         // Se cabe normalmente, adiciona centralizado verticalmente
         const yOffset = (pageHeight - imgHeight) / 2;
-        pdf.addImage(imgData, 'PNG', 0, yOffset, imgWidth, imgHeight);
+        pdf.addImage(imgData, 'JPEG', 0, yOffset, imgWidth, imgHeight);
       }
 
       pdf.save(`simulacao-consorcio-${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`);
